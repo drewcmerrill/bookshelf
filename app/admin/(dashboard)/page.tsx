@@ -183,7 +183,7 @@ export default async function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Genres</h2>
           <div className="space-y-3">
-            {genreCounts.map((genre, index) => {
+            {genreCounts.map((genre: { genre: string | null; _count: { genre: number } }, index: number) => {
               const percentage = Math.round((genre._count.genre / totalBooks) * 100);
               const colors = [
                 "bg-blue-500",
@@ -223,7 +223,7 @@ export default async function AdminDashboard() {
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {recentBooks.map((book) => (
+          {recentBooks.map((book: { id: number; title: string; author: string | null; img: string; read: string | null }) => (
             <Link
               key={book.id}
               href={`/admin/books/${book.id}/edit`}

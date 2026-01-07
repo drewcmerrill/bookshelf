@@ -10,7 +10,7 @@ export default async function Home() {
   });
 
   // Transform Prisma types to match existing Book type
-  const books: Book[] = dbBooks.map((book) => ({
+  const books: Book[] = dbBooks.map((book: typeof dbBooks[number]) => ({
     title: book.title,
     img: book.img,
     height: book.height,
