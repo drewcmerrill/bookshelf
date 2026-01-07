@@ -19,7 +19,16 @@ export default async function Home() {
     pages: book.pages ?? undefined,
     genre: book.genre ?? undefined,
     description: book.description ?? undefined,
-    rating: book.rating ?? undefined,
+    // Multi-factor ratings
+    ratingWriting: book.ratingWriting ?? undefined,
+    ratingPlot: book.ratingPlot ?? undefined,
+    ratingCharacters: book.ratingCharacters ?? undefined,
+    ratingPacing: book.ratingPacing ?? undefined,
+    ratingWorldBuilding: book.ratingWorldBuilding ?? undefined,
+    ratingEnjoyment: book.ratingEnjoyment ?? undefined,
+    ratingRecommend: book.ratingRecommend ?? undefined,
+    ratingOverall: book.ratingOverall ?? undefined,
+    ratingOverrideManual: book.ratingOverrideManual ?? undefined,
   }));
 
   return (

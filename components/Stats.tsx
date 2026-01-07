@@ -21,9 +21,9 @@ export function Stats({ books }: StatsProps) {
   const readPercentage = totalBooks > 0 ? Math.round((totalReadBooks / totalBooks) * 100) : 0;
 
   // Get average rating of rated books
-  const ratedBooks = books.filter((book) => book.rating);
+  const ratedBooks = books.filter((book) => book.ratingOverall);
   const averageRating = ratedBooks.length > 0
-    ? (ratedBooks.reduce((sum, book) => sum + (book.rating || 0), 0) / ratedBooks.length).toFixed(1)
+    ? (ratedBooks.reduce((sum, book) => sum + (book.ratingOverall || 0), 0) / ratedBooks.length).toFixed(1)
     : null;
 
   return (

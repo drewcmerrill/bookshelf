@@ -19,7 +19,19 @@ model Book {
   pages       Int?
   genre       String?  @db.VarChar(255)
   description String?  @db.Text
-  rating      Int?
+  rating      Int?     // Legacy - to be removed after migration
+
+  // Multi-factor rating system (1-5 scale each)
+  ratingWriting       Int?
+  ratingPlot          Int?
+  ratingCharacters    Int?
+  ratingPacing        Int?
+  ratingWorldBuilding Int?
+  ratingEnjoyment     Int?
+  ratingRecommend     Int?
+  ratingOverall       Float?            // Auto-calculated or manual override
+  ratingOverrideManual Boolean @default(false)
+
   shelf       Int      @default(1)
   position    Int      @default(0)
   createdAt   DateTime @default(now())
@@ -31,6 +43,7 @@ model Book {
   @@index([shelf])
   @@index([position])
   @@index([rating])
+  @@index([ratingOverall])
 }
 
 model Setting {

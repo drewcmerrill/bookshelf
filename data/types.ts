@@ -7,6 +7,18 @@ export type Book = {
   pages?: number;
   genre?: string;
   description?: string;
-  rating?: number;
+  rating?: number; // Legacy - kept for compatibility
+
+  // Multi-factor rating system
+  ratingWriting?: number;
+  ratingPlot?: number;
+  ratingCharacters?: number;
+  ratingPacing?: number;
+  ratingWorldBuilding?: number;
+  ratingEnjoyment?: number;
+  ratingRecommend?: number;
+  ratingOverall?: number;
+  ratingOverrideManual?: boolean;
+
   shelf?: number;
 };

@@ -13,7 +13,7 @@ type Book = {
   pages: number | null;
   read: string | null;
   genre: string | null;
-  rating: number | null;
+  ratingOverall: number | null;
   position: number;
 };
 
@@ -202,7 +202,7 @@ export function DraggableBookList({ books: initialBooks }: { books: Book[] }) {
                 </div>
 
                 <div className="mt-2">
-                  {renderStars(book.rating)}
+                  {renderStars(book.ratingOverall)}
                 </div>
 
                 {/* Actions */}
@@ -297,7 +297,7 @@ export function DraggableBookList({ books: initialBooks }: { books: Book[] }) {
                   {renderStatusBadge(book.read)}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
-                  {renderStars(book.rating)}
+                  {renderStars(book.ratingOverall)}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                   <Link

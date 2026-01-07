@@ -13,7 +13,7 @@ export default async function AdminBooksPage() {
       pages: true,
       read: true,
       genre: true,
-      rating: true,
+      ratingOverall: true,
       position: true,
     },
   });

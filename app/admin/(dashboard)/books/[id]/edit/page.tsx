@@ -37,7 +37,16 @@ export default async function EditBookPage({ params }: Props) {
           pages: book.pages,
           genre: book.genre,
           description: book.description,
-          rating: book.rating,
+          // Multi-factor ratings
+          ratingWriting: book.ratingWriting,
+          ratingPlot: book.ratingPlot,
+          ratingCharacters: book.ratingCharacters,
+          ratingPacing: book.ratingPacing,
+          ratingWorldBuilding: book.ratingWorldBuilding,
+          ratingEnjoyment: book.ratingEnjoyment,
+          ratingRecommend: book.ratingRecommend,
+          ratingOverall: book.ratingOverall,
+          ratingOverrideManual: book.ratingOverrideManual,
         }}
       />
     </div>

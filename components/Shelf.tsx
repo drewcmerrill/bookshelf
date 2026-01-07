@@ -2,6 +2,8 @@
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Book } from "@/data/types";
+import { RATING_FACTORS } from "@/lib/ratings";
+import { StarRating } from "./ui/StarRating";
 
 const shelfHeight = 500;
 const shelfThickness = 20;
@@ -263,28 +265,60 @@ export function Shelf({ books }: { books: Book[] }) {
                     </p>
                   )}
 
-                  {/* Rating */}
-                  {selectedBook.rating && (
-                    <div className="flex items-center gap-1 mt-3">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          className={`w-5 h-5 ${
-                            star <= selectedBook.rating!
-                              ? "text-yellow-500 fill-yellow-500"
-                              : "text-[#d4c4b0]"
-                          }`}
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
-                          />
-                        </svg>
-                      ))}
+                  {/* Overall Rating */}
+                  {selectedBook.ratingOverall && (
+                    <div className="flex items-center gap-2 mt-3">
+                      <StarRating
+                        value={selectedBook.ratingOverall}
+                        size="sm"
+                        disabled
+                      />
+                      <span className="text-sm text-[#6b5a4a]">
+                        {selectedBook.ratingOverall.toFixed(1)}/5
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Rating Factors Breakdown */}
+                  {selectedBook.ratingOverall && (
+                    <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1">
+                      {RATING_FACTORS.map((factor) => {
+                        const value = selectedBook[
+                          factor.key as keyof Book
+                        ] as number | undefined;
+                        if (!value) return null;
+                        return (
+                          <div
+                            key={factor.key}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <span className="text-[#6b5a4a]">
+                              {factor.shortLabel}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  className={`w-3 h-3 ${
+                                    star <= value
+                                      ? "text-yellow-500 fill-yellow-500"
+                                      : "text-[#d4c4b0]"
+                                  }`}
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={1.5}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+                                  />
+                                </svg>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 

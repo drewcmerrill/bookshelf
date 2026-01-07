@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BookSearch, BookSearchResult } from "./BookSearch";
+import { StarRating } from "../ui/StarRating";
+import { RATING_FACTORS, calculateOverallRating } from "@/lib/ratings";
 
 type BookData = {
   id?: number;
@@ -15,7 +17,16 @@ type BookData = {
   pages: number | null;
   genre: string | null;
   description: string | null;
-  rating: number | null;
+  // Multi-factor ratings
+  ratingWriting: number | null;
+  ratingPlot: number | null;
+  ratingCharacters: number | null;
+  ratingPacing: number | null;
+  ratingWorldBuilding: number | null;
+  ratingEnjoyment: number | null;
+  ratingRecommend: number | null;
+  ratingOverall: number | null;
+  ratingOverrideManual: boolean;
 };
 
 type Props = {
@@ -31,8 +42,10 @@ export function BookForm({ initialData, mode }: Props) {
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialData?.img ? `/${initialData.img}` : null
   );
-  // State for book selected from search
-  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null);
+  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(
+    null
+  );
+  const [showDetailedRating, setShowDetailedRating] = useState(false);
 
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
@@ -43,7 +56,16 @@ export function BookForm({ initialData, mode }: Props) {
     pages: initialData?.pages || "",
     genre: initialData?.genre || "",
     description: initialData?.description || "",
-    rating: initialData?.rating || 0,
+    // Multi-factor ratings
+    ratingWriting: initialData?.ratingWriting || 0,
+    ratingPlot: initialData?.ratingPlot || 0,
+    ratingCharacters: initialData?.ratingCharacters || 0,
+    ratingPacing: initialData?.ratingPacing || 0,
+    ratingWorldBuilding: initialData?.ratingWorldBuilding || 0,
+    ratingEnjoyment: initialData?.ratingEnjoyment || 0,
+    ratingRecommend: initialData?.ratingRecommend || 0,
+    ratingOverall: initialData?.ratingOverall || 0,
+    ratingOverrideManual: initialData?.ratingOverrideManual || false,
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,11 +73,10 @@ export function BookForm({ initialData, mode }: Props) {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      setSelectedThumbnail(null); // Clear search thumbnail if user uploads
+      setSelectedThumbnail(null);
     }
   };
 
-  // Handler for when a book is selected from search
   const handleBookSelect = (book: BookSearchResult) => {
     setFormData({
       ...formData,
@@ -66,12 +87,43 @@ export function BookForm({ initialData, mode }: Props) {
       description: book.description || "",
     });
 
-    // Set thumbnail for potential download
     if (book.thumbnail) {
       setSelectedThumbnail(book.thumbnail);
       setImagePreview(book.thumbnail);
-      setImageFile(null); // Clear any uploaded file
+      setImageFile(null);
     }
+  };
+
+  const handleFactorChange = (factorKey: string, value: number) => {
+    const newFormData = { ...formData, [factorKey]: value };
+
+    // Auto-recalculate overall if not manually overridden
+    if (!formData.ratingOverrideManual) {
+      const calculated = calculateOverallRating(newFormData);
+      newFormData.ratingOverall = calculated || 0;
+    }
+
+    setFormData(newFormData);
+  };
+
+  const handleOverallChange = (value: number) => {
+    setFormData({
+      ...formData,
+      ratingOverall: value,
+      ratingOverrideManual: true,
+    });
+  };
+
+  const handleOverrideToggle = (checked: boolean) => {
+    const newFormData = { ...formData, ratingOverrideManual: checked };
+
+    // If turning off override, recalculate from factors
+    if (!checked) {
+      const calculated = calculateOverallRating(formData);
+      newFormData.ratingOverall = calculated || 0;
+    }
+
+    setFormData(newFormData);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,7 +134,6 @@ export function BookForm({ initialData, mode }: Props) {
     try {
       let imagePath = formData.img;
 
-      // Upload image if new file selected
       if (imageFile) {
         const uploadData = new FormData();
         uploadData.append("file", imageFile);
@@ -99,9 +150,7 @@ export function BookForm({ initialData, mode }: Props) {
 
         const uploadResult = await uploadRes.json();
         imagePath = uploadResult.path;
-      }
-      // Download cover from Google Books if selected from search
-      else if (selectedThumbnail && !formData.img) {
+      } else if (selectedThumbnail && !formData.img) {
         const coverRes = await fetch("/api/books/cover", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -128,13 +177,20 @@ export function BookForm({ initialData, mode }: Props) {
         pages: formData.pages ? Number(formData.pages) : null,
         genre: formData.genre || null,
         description: formData.description || null,
-        rating: formData.rating ? Number(formData.rating) : null,
+        // Multi-factor ratings
+        ratingWriting: formData.ratingWriting || null,
+        ratingPlot: formData.ratingPlot || null,
+        ratingCharacters: formData.ratingCharacters || null,
+        ratingPacing: formData.ratingPacing || null,
+        ratingWorldBuilding: formData.ratingWorldBuilding || null,
+        ratingEnjoyment: formData.ratingEnjoyment || null,
+        ratingRecommend: formData.ratingRecommend || null,
+        ratingOverall: formData.ratingOverall || null,
+        ratingOverrideManual: formData.ratingOverrideManual,
       };
 
       const url =
-        mode === "create"
-          ? "/api/books"
-          : `/api/books/${initialData?.id}`;
+        mode === "create" ? "/api/books" : `/api/books/${initialData?.id}`;
       const method = mode === "create" ? "POST" : "PUT";
 
       const res = await fetch(url, {
@@ -158,12 +214,14 @@ export function BookForm({ initialData, mode }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-lg shadow-md p-4 sm:p-6"
+    >
       {error && (
         <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-md">{error}</div>
       )}
 
-      {/* Book Search */}
       <BookSearch onSelect={handleBookSelect} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -265,50 +323,98 @@ export function BookForm({ initialData, mode }: Props) {
             </div>
           </div>
 
+          {/* Multi-factor Rating Section */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Rating
             </label>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() =>
-                    setFormData({
-                      ...formData,
-                      rating: formData.rating === star ? 0 : star,
-                    })
-                  }
-                  className="p-1 hover:scale-110 transition-transform"
-                >
-                  <svg
-                    className={`w-8 h-8 ${
-                      star <= formData.rating
-                        ? "text-yellow-400 fill-yellow-400"
-                        : "text-gray-300"
-                    }`}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
-                    />
-                  </svg>
-                </button>
-              ))}
-              {formData.rating > 0 && (
-                <span className="ml-2 text-sm text-gray-500">
-                  {formData.rating}/5
-                </span>
-              )}
+
+            {/* Overall Rating Display */}
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-sm text-gray-600 w-16">Overall:</span>
+              <StarRating
+                value={formData.ratingOverall}
+                onChange={handleOverallChange}
+                size="lg"
+                disabled={!formData.ratingOverrideManual}
+              />
+              <span className="text-sm text-gray-500">
+                {formData.ratingOverall > 0
+                  ? `${formData.ratingOverall.toFixed(1)}/5`
+                  : "-"}
+              </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Click a star to rate, click again to remove
-            </p>
+
+            {/* Toggle for detailed ratings */}
+            <button
+              type="button"
+              onClick={() => setShowDetailedRating(!showDetailedRating)}
+              className="text-sm text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-1"
+            >
+              <svg
+                className={`w-4 h-4 transition-transform ${
+                  showDetailedRating ? "rotate-90" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+              {showDetailedRating
+                ? "Hide detailed ratings"
+                : "Show detailed ratings"}
+            </button>
+
+            {/* Detailed Rating Factors */}
+            {showDetailedRating && (
+              <div className="p-3 bg-gray-50 rounded-md space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {RATING_FACTORS.map((factor) => (
+                    <div
+                      key={factor.key}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="text-sm text-gray-700">
+                        {factor.label}
+                      </span>
+                      <StarRating
+                        value={
+                          formData[factor.key as keyof typeof formData] as number
+                        }
+                        onChange={(val) => handleFactorChange(factor.key, val)}
+                        size="sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Manual override toggle */}
+                <div className="pt-2 border-t border-gray-200">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.ratingOverrideManual}
+                      onChange={(e) => handleOverrideToggle(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-600">
+                      Override calculated average
+                    </span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1 ml-6">
+                    {formData.ratingOverrideManual
+                      ? "Click overall stars to set manually"
+                      : "Overall rating auto-calculated from factors"}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -335,14 +441,12 @@ export function BookForm({ initialData, mode }: Props) {
             {imagePreview ? (
               <div className="relative w-full aspect-[2/3] max-w-xs mx-auto">
                 {imagePreview.startsWith("http") ? (
-                  // External URL from Google Books
                   <img
                     src={imagePreview}
                     alt="Cover preview"
                     className="w-full h-full object-contain rounded"
                   />
                 ) : (
-                  // Local image
                   <Image
                     src={imagePreview}
                     alt="Cover preview"
