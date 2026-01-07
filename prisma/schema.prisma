@@ -6,19 +6,19 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
 }
 
 model Book {
   id          Int      @id @default(autoincrement())
-  title       String
-  img         String
+  title       String   @db.VarChar(500)
+  img         String   @db.VarChar(500)
   height      Float
   read        String?
-  author      String?
+  author      String?  @db.VarChar(500)
   pages       Int?
-  genre       String?
-  description String?
+  genre       String?  @db.VarChar(255)
+  description String?  @db.Text
   rating      Int?
   shelf       Int      @default(1)
   position    Int      @default(0)
