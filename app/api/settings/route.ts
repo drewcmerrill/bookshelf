@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 // Default settings
 const DEFAULT_SETTINGS: Record<string, string> = {
@@ -43,6 +44,9 @@ export async function PUT(request: NextRequest) {
       update: { value },
       create: { key, value },
     });
+
+    // Revalidate admin pages that use settings
+    revalidatePath("/admin", "layout");
 
     return NextResponse.json(setting);
   } catch (error) {
