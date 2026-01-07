@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,6 +61,11 @@ export async function POST(request: NextRequest) {
         position: newPosition,
       },
     });
+
+    // Revalidate cached pages
+    revalidatePath("/");
+    revalidatePath("/admin/books");
+    revalidatePath("/admin");
 
     return NextResponse.json(book, { status: 201 });
   } catch (error) {

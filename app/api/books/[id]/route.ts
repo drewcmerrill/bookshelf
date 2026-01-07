@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -59,6 +60,11 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       },
     });
 
+    // Revalidate cached pages
+    revalidatePath("/");
+    revalidatePath("/admin/books");
+    revalidatePath("/admin");
+
     return NextResponse.json(book);
   } catch (error) {
     console.error("Error updating book:", error);
@@ -81,6 +87,11 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     await prisma.book.delete({
       where: { id: bookId },
     });
+
+    // Revalidate cached pages
+    revalidatePath("/");
+    revalidatePath("/admin/books");
+    revalidatePath("/admin");
 
     return NextResponse.json({ success: true });
   } catch (error) {

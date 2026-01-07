@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 type BookUpdate = {
   id: number;
@@ -31,6 +32,11 @@ export async function PUT(request: NextRequest) {
         })
       )
     );
+
+    // Revalidate cached pages
+    revalidatePath("/");
+    revalidatePath("/admin/books");
+    revalidatePath("/admin");
 
     return NextResponse.json({ success: true });
   } catch (error) {
