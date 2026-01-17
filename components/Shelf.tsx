@@ -238,7 +238,7 @@ export function Shelf({ books }: { books: Book[] }) {
               {/* Header with book cover */}
               <div className="flex flex-col sm:flex-row gap-6 p-6 pb-4">
                 {/* Book Cover */}
-                <div className="flex-shrink-0 flex justify-center sm:justify-start">
+                <div className="shrink-0 flex justify-center sm:justify-start">
                   <div
                     className="relative"
                     style={{
@@ -370,7 +370,7 @@ export function Shelf({ books }: { books: Book[] }) {
               {/* Description */}
               {selectedBook.description && (
                 <div className="px-6 pb-6">
-                  <div className="h-px bg-gradient-to-r from-transparent via-[#c4a77d] to-transparent mb-4" />
+                  <div className="h-px bg-linear-to-r from-transparent via-[#c4a77d] to-transparent mb-4" />
                   <p className="text-[#4a3f35] whitespace-pre-line leading-relaxed">
                     {selectedBook.description}
                   </p>
@@ -379,7 +379,7 @@ export function Shelf({ books }: { books: Book[] }) {
             </div>
 
             {/* Footer */}
-            <div className="h-1.5 bg-gradient-to-r from-[#A07A55] via-[#c4a77d] to-[#A07A55]" />
+            <div className="h-1.5 bg-linear-to-r from-[#A07A55] via-[#c4a77d] to-[#A07A55]" />
           </div>
         </div>
       )}

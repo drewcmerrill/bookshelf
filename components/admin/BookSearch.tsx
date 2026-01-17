@@ -146,10 +146,10 @@ export function BookSearch({ onSelect }: Props) {
                 <img
                   src={book.thumbnail}
                   alt={book.title}
-                  className="w-10 h-14 object-cover rounded flex-shrink-0"
+                  className="w-10 h-14 object-cover rounded shrink-0"
                 />
               ) : (
-                <div className="w-10 h-14 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
+                <div className="w-10 h-14 bg-gray-200 rounded shrink-0 flex items-center justify-center">
                   <svg
                     className="w-5 h-5 text-gray-400"
                     fill="none"
@@ -170,7 +170,9 @@ export function BookSearch({ onSelect }: Props) {
                   {book.title}
                 </p>
                 {book.author && (
-                  <p className="text-sm text-gray-500 truncate">{book.author}</p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {book.author}
+                  </p>
                 )}
                 <p className="text-xs text-gray-400">
                   {book.pages && `${book.pages} pages`}
@@ -186,14 +188,11 @@ export function BookSearch({ onSelect }: Props) {
         </div>
       )}
 
-      {showResults &&
-        query.length >= 2 &&
-        results.length === 0 &&
-        !loading && (
-          <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-4 text-center text-gray-500">
-            No books found
-          </div>
-        )}
+      {showResults && query.length >= 2 && results.length === 0 && !loading && (
+        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-4 text-center text-gray-500">
+          No books found
+        </div>
+      )}
     </div>
   );
 }

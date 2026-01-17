@@ -356,7 +356,7 @@ export default async function AdminDashboard() {
                 href={`/admin/books/${book.id}/edit`}
                 className="group"
               >
-                <div className="aspect-[2/3] relative rounded-lg overflow-hidden bg-gray-100 mb-2">
+                <div className="aspect-2/3 relative rounded-lg overflow-hidden bg-gray-100 mb-2">
                   <Image
                     src={`/${book.img}`}
                     alt={book.title}

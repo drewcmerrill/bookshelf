@@ -156,7 +156,7 @@ export function Calculator() {
         <p className="text-lg sm:text-xl font-semibold text-gray-600">=</p>
         <p
           className={cn(
-            "text-lg sm:text-xl font-semibold min-w-[50px] sm:min-w-[60px]",
+            "text-lg sm:text-xl font-semibold min-w-12.5 sm:min-w-15",
             result !== undefined && result === answer
               ? "text-green-500"
               : "text-red-500"
