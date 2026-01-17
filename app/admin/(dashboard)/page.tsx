@@ -34,7 +34,7 @@ export default async function AdminDashboard() {
   const genreCountMap = new Map<string, number>();
   for (const book of booksWithGenres) {
     if (book.genre) {
-      const genres = book.genre.split(",").map((g) => g.trim());
+      const genres = book.genre.split(",").map((g: string) => g.trim());
       for (const genre of genres) {
         genreCountMap.set(genre, (genreCountMap.get(genre) || 0) + 1);
       }
