@@ -18,7 +18,6 @@ export function Stats({ books }: StatsProps) {
           books.reduce((sum, book) => sum + (book.pages || 0), 0) / books.length
         )
       : 0;
-  const readPercentage = totalBooks > 0 ? Math.round((totalReadBooks / totalBooks) * 100) : 0;
 
   // Get average rating of rated books
   const ratedBooks = books.filter((book) => book.ratingOverall);
@@ -86,20 +85,6 @@ export function Stats({ books }: StatsProps) {
             <div className="text-center p-3 rounded-lg bg-white/40">
               <div className="text-3xl font-bold text-[#3d2e1f]">{averagePages}</div>
               <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">Avg Pages</div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mt-5">
-            <div className="flex justify-between text-xs text-[#6b5a4a] mb-2">
-              <span>Reading Progress</span>
-              <span>{readPercentage}% Complete</span>
-            </div>
-            <div className="h-2.5 bg-[#d4c4b0] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-[#2d5a27] to-[#4a7c42] rounded-full transition-all duration-500"
-                style={{ width: `${readPercentage}%` }}
-              />
             </div>
           </div>
 
