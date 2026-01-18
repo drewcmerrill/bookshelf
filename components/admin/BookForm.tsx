@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { BookSearch, BookSearchResult } from "./BookSearch";
 import { StarRating } from "../ui/StarRating";
 import { RATING_FACTORS, calculateOverallRating } from "@/lib/ratings";
 
@@ -42,10 +41,7 @@ export function BookForm({ initialData, mode }: Props) {
   const [error, setError] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
-    initialData?.img ? `/${initialData.img}` : null
-  );
-  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(
-    null
+    initialData?.img ? (initialData.img.startsWith("http") ? initialData.img : `/${initialData.img}`) : null
   );
   const [showDetailedRating, setShowDetailedRating] = useState(false);
 
@@ -77,24 +73,6 @@ export function BookForm({ initialData, mode }: Props) {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      setSelectedThumbnail(null);
-    }
-  };
-
-  const handleBookSelect = (book: BookSearchResult) => {
-    setFormData({
-      ...formData,
-      title: book.title,
-      author: book.author || "",
-      pages: book.pages?.toString() || "",
-      genre: book.genre || "",
-      description: book.description || "",
-    });
-
-    if (book.thumbnail) {
-      setSelectedThumbnail(book.thumbnail);
-      setImagePreview(book.thumbnail);
-      setImageFile(null);
     }
   };
 
@@ -154,22 +132,6 @@ export function BookForm({ initialData, mode }: Props) {
 
         const uploadResult = await uploadRes.json();
         imagePath = uploadResult.path;
-      } else if (selectedThumbnail && !formData.img) {
-        const coverRes = await fetch("/api/books/cover", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            imageUrl: selectedThumbnail,
-            title: formData.title,
-          }),
-        });
-
-        if (coverRes.ok) {
-          const coverResult = await coverRes.json();
-          imagePath = coverResult.path;
-        } else {
-          throw new Error("Failed to download cover image");
-        }
       }
 
       const bookData = {
@@ -227,8 +189,6 @@ export function BookForm({ initialData, mode }: Props) {
       {error && (
         <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-md">{error}</div>
       )}
-
-      <BookSearch onSelect={handleBookSelect} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column */}
@@ -471,12 +431,12 @@ export function BookForm({ initialData, mode }: Props) {
         {/* Right Column - Image */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Cover Image {mode === "create" && !selectedThumbnail && "*"}
+            Cover Image {mode === "create" && "*"}
           </label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
             {imagePreview ? (
               <div className="relative w-full aspect-[2/3] max-w-xs mx-auto">
-                {imagePreview.startsWith("http") ? (
+                {imagePreview.startsWith("http") || imagePreview.startsWith("blob:") ? (
                   <img
                     src={imagePreview}
                     alt="Cover preview"
@@ -503,9 +463,7 @@ export function BookForm({ initialData, mode }: Props) {
               className="mt-4 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
             <p className="text-xs text-gray-500 mt-2">
-              {selectedThumbnail
-                ? "Cover from Google Books will be downloaded, or upload your own"
-                : "Accepted formats: WebP, PNG, JPG"}
+              Accepted formats: WebP, PNG, JPG
             </p>
           </div>
 

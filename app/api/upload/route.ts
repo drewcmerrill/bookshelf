@@ -1,6 +1,5 @@
-import { writeFile } from "fs/promises";
+import { put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,15 +25,14 @@ export async function POST(request: NextRequest) {
       ? title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_")
       : file.name.replace(/\.[^/.]+$/, "");
     const extension = file.name.split(".").pop() || "webp";
-    const filename = `${sanitizedTitle}.${extension}`;
+    const filename = `books/${sanitizedTitle}.${extension}`;
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Upload to Vercel Blob
+    const blob = await put(filename, file, {
+      access: "public",
+    });
 
-    const filepath = path.join(process.cwd(), "public", "books", filename);
-    await writeFile(filepath, buffer);
-
-    return NextResponse.json({ path: `books/${filename}` });
+    return NextResponse.json({ path: blob.url });
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json(
