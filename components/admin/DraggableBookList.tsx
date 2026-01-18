@@ -180,7 +180,7 @@ export function DraggableBookList({ books: initialBooks }: { books: Book[] }) {
                 </div>
                 <div className="w-16 h-24 relative flex-shrink-0">
                   <Image
-                    src={`/${book.img}`}
+                    src={book.img.startsWith("http") ? book.img : `/${book.img}`}
                     alt={book.title}
                     fill
                     className="object-cover rounded"
@@ -273,7 +273,7 @@ export function DraggableBookList({ books: initialBooks }: { books: Book[] }) {
                   <div className="flex items-center">
                     <div className="w-10 h-14 relative flex-shrink-0">
                       <Image
-                        src={`/${book.img}`}
+                        src={book.img.startsWith("http") ? book.img : `/${book.img}`}
                         alt={book.title}
                         fill
                         className="object-cover rounded"
