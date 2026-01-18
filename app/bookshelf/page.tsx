@@ -37,6 +37,27 @@ export default async function BookshelfPage() {
 
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen">
+      {/* Back Button */}
+      <Link
+        href="/"
+        className="fixed top-6 left-6 sm:top-4 sm:left-4 z-50 p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors group"
+        title="Back to Home"
+      >
+        <svg
+          className="w-5 h-5 text-gray-600 group-hover:text-gray-800 transition-colors"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+      </Link>
+
       {/* Admin Login Button */}
       <Link
         href="/admin"
