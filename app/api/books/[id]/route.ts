@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { del } from "@vercel/blob";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -93,6 +94,25 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     if (isNaN(bookId)) {
       return NextResponse.json({ error: "Invalid book ID" }, { status: 400 });
+    }
+
+    // Fetch the book to get the image URL
+    const book = await prisma.book.findUnique({
+      where: { id: bookId },
+    });
+
+    if (!book) {
+      return NextResponse.json({ error: "Book not found" }, { status: 404 });
+    }
+
+    // Delete the image from Vercel Blob if it's a blob URL
+    if (book.img && book.img.includes("blob.vercel-storage.com")) {
+      try {
+        await del(book.img);
+      } catch (blobError) {
+        console.error("Error deleting blob image:", blobError);
+        // Continue with book deletion even if blob deletion fails
+      }
     }
 
     await prisma.book.delete({
