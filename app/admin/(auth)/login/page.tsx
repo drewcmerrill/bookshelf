@@ -191,7 +191,7 @@ export default function AdminLoginPage() {
 
           <p className="mt-8 text-center text-sm text-gray-500">
             <a
-              href="/"
+              href="/bookshelf"
               className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               <svg

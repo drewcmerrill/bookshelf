@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Image from "next/image";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -15,17 +14,6 @@ export default async function AdminDashboard() {
   });
   const totalPages = totalPagesResult._sum.pages || 0;
 
-  const recentBooks = await prisma.book.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      title: true,
-      author: true,
-      img: true,
-      read: true,
-    },
-  });
 
   // Get all books with genres and count individual genres (split by comma)
   const booksWithGenres = await prisma.book.findMany({
@@ -329,53 +317,6 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Recently Added */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Recently Added
-          </h2>
-          <Link
-            href="/admin/books"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-          >
-            View all
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-          {recentBooks.map(
-            (book: {
-              id: number;
-              title: string;
-              author: string | null;
-              img: string;
-              read: string | null;
-            }) => (
-              <Link
-                key={book.id}
-                href={`/admin/books/${book.id}/edit`}
-                className="group"
-              >
-                <div className="aspect-2/3 relative rounded-lg overflow-hidden bg-gray-100 mb-2">
-                  <Image
-                    src={`/${book.img}`}
-                    alt={book.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 20vw"
-                  />
-                </div>
-                <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                  {book.title}
-                </h3>
-                <p className="text-xs text-gray-500 truncate">
-                  {book.author || "Unknown author"}
-                </p>
-              </Link>
-            )
-          )}
-        </div>
-      </div>
     </div>
   );
 }
