@@ -40,11 +40,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get max position to add new book at the end
-    const maxPosition = await prisma.book.aggregate({
-      _max: { position: true },
+    // Shift all existing books down by 1 position to make room at the beginning
+    await prisma.book.updateMany({
+      data: {
+        position: { increment: 1 },
+      },
     });
-    const newPosition = (maxPosition._max.position ?? -1) + 1;
 
     const book = await prisma.book.create({
       data: {
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
         ratingOverall: body.ratingOverall || null,
         ratingOverrideManual: body.ratingOverrideManual || false,
         shelf: body.shelf || 1,
-        position: newPosition,
+        position: 0,
       },
     });
 
