@@ -549,17 +549,10 @@ function LoafCard({
       </div>
 
       {/* Notes */}
-      <div>
-        <label className="text-gray-700 text-sm font-medium block mb-2">Notes</label>
-        <textarea
-          value={loaf.notes || ""}
-          onChange={(e) => onUpdate({ notes: e.target.value || null })}
-          onBlur={(e) => onUpdate({ notes: e.target.value || null })}
-          rows={2}
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="How did it turn out?"
-        />
-      </div>
+      <NotesInput
+        value={loaf.notes}
+        onSave={(notes) => onUpdate({ notes })}
+      />
     </div>
   );
 }
@@ -796,6 +789,53 @@ function CrossSectionInput({
         placeholder="0"
       />
       <span className="text-gray-400 text-sm">in</span>
+    </div>
+  );
+}
+
+function NotesInput({
+  value,
+  onSave,
+}: {
+  value: string | null;
+  onSave: (notes: string | null) => void;
+}) {
+  const [localValue, setLocalValue] = useState(value || "");
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    setLocalValue(value || "");
+    setHasChanges(false);
+  }, [value]);
+
+  const handleChange = (newValue: string) => {
+    setLocalValue(newValue);
+    setHasChanges(newValue !== (value || ""));
+  };
+
+  const handleSave = () => {
+    onSave(localValue || null);
+    setHasChanges(false);
+  };
+
+  return (
+    <div>
+      <label className="text-gray-700 text-sm font-medium block mb-2">Notes</label>
+      <textarea
+        value={localValue}
+        onChange={(e) => handleChange(e.target.value)}
+        rows={2}
+        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder="How did it turn out?"
+      />
+      {hasChanges && (
+        <button
+          onClick={handleSave}
+          className="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-lg transition-colors"
+        >
+          Save Notes
+        </button>
+      )}
     </div>
   );
 }
