@@ -107,19 +107,19 @@ export default function SourdoughPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="p-4 flex justify-between items-center">
+      <header className="bg-white border-b border-slate-200 px-4 py-4 flex justify-between items-center">
         <Link
           href="/"
-          className="text-white/70 hover:text-white transition-colors flex items-center gap-2"
+          className="text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back
         </Link>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Sourdough</h1>
+        <h1 className="text-xl font-semibold text-slate-900">Sourdough Log</h1>
         <div className="w-16" />
       </header>
 
@@ -129,7 +129,7 @@ export default function SourdoughPage() {
         <button
           onClick={startNewLoaf}
           disabled={saving}
-          className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/50 text-white font-semibold py-3 rounded-xl mb-6 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-medium py-3 rounded-lg mb-6 transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -140,12 +140,11 @@ export default function SourdoughPage() {
         {/* Loaves */}
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
           </div>
         ) : loaves.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🍞</div>
-            <p className="text-white/60">No loaves recorded yet</p>
+            <p className="text-slate-400">No loaves recorded yet</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -185,24 +184,24 @@ function LoafCard({
   const hydration = calculateHydration(loaf.waterGrams, loaf.flourGrams);
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 space-y-4">
+    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4 shadow-sm">
       {/* Header Row */}
       <div className="flex justify-between items-start">
         <div>
-          <div className="text-white font-semibold">
+          <div className="text-slate-900 font-medium">
             {new Date(loaf.date).toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",
               day: "numeric",
             })}
           </div>
-          <div className="text-white/60 text-sm">
+          <div className="text-slate-500 text-sm">
             Started at {loaf.initialMixTime}
           </div>
         </div>
         <button
           onClick={onDelete}
-          className="text-white/40 hover:text-red-400 transition-colors p-1"
+          className="text-slate-300 hover:text-red-500 transition-colors p-1"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -236,8 +235,8 @@ function LoafCard({
       </div>
 
       {/* Hydration */}
-      {hydration && (
-        <div className="text-amber-300 text-sm">
+      {hydration !== null && hydration > 0 && (
+        <div className="text-slate-600 text-sm font-medium">
           Hydration: {hydration}%
         </div>
       )}
@@ -245,10 +244,10 @@ function LoafCard({
       {/* Stretch & Folds */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-white/70 text-sm">Stretch & Folds</span>
+          <span className="text-slate-600 text-sm">Stretch & Folds</span>
           <button
             onClick={onAddFold}
-            className="bg-white/20 hover:bg-white/30 text-white text-sm px-3 py-1 rounded-lg transition-colors flex items-center gap-1"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded-md transition-colors flex items-center gap-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -261,12 +260,12 @@ function LoafCard({
             {loaf.stretchFolds.map((time, index) => (
               <span
                 key={index}
-                className="bg-white/20 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm flex items-center gap-2"
               >
                 {time}
                 <button
                   onClick={() => onRemoveFold(index)}
-                  className="text-white/60 hover:text-white"
+                  className="text-slate-400 hover:text-slate-600"
                 >
                   ×
                 </button>
@@ -274,19 +273,19 @@ function LoafCard({
             ))}
           </div>
         ) : (
-          <div className="text-white/40 text-sm">None yet</div>
+          <div className="text-slate-400 text-sm">None yet</div>
         )}
       </div>
 
       {/* Notes */}
       <div>
-        <label className="text-white/70 text-sm block mb-1">Notes</label>
+        <label className="text-slate-600 text-sm block mb-1">Notes</label>
         <textarea
           value={loaf.notes || ""}
           onChange={(e) => onUpdate({ notes: e.target.value || null })}
           onBlur={(e) => onUpdate({ notes: e.target.value || null })}
           rows={2}
-          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-white/40 resize-none"
+          className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 text-sm placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-transparent"
           placeholder="How did it turn out?"
         />
       </div>
@@ -324,23 +323,23 @@ function IngredientRow({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-white/70 text-sm w-16">{label}</span>
+      <span className="text-slate-600 text-sm w-16">{label}</span>
       <input
         type="number"
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         onBlur={() => onValueChange(parseInt(localValue) || 0)}
-        className="w-20 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm text-right"
+        className="w-20 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 text-slate-900 text-sm text-right focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-transparent"
         placeholder="0"
       />
-      <span className="text-white/50 text-sm">{unit}</span>
+      <span className="text-slate-400 text-sm">{unit}</span>
       {onSecondaryChange && (
         <input
           type="text"
           value={localSecondary}
           onChange={(e) => setLocalSecondary(e.target.value)}
           onBlur={() => onSecondaryChange(localSecondary)}
-          className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm"
+          className="flex-1 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-transparent"
           placeholder={secondaryPlaceholder}
         />
       )}
