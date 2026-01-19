@@ -132,7 +132,24 @@ export default function SourdoughPage() {
           Back
         </Link>
         <h1 className="text-xl font-semibold text-slate-900">Sourdough Log</h1>
-        <div className="w-16" />
+        {isAdmin ? (
+          <button
+            onClick={async () => {
+              await fetch("/api/auth", { method: "DELETE" });
+              setIsAdmin(false);
+            }}
+            className="text-slate-400 hover:text-slate-600 transition-colors text-sm"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link
+            href="/admin/login"
+            className="text-slate-400 hover:text-slate-600 transition-colors text-sm"
+          >
+            Login
+          </Link>
+        )}
       </header>
 
       {/* Main Content */}
