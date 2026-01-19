@@ -88,6 +88,8 @@ type SourdoughLoaf = {
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
+  crossSectionWidth: number | null;
+  crossSectionHeight: number | null;
   notes: string | null;
 };
 
@@ -528,6 +530,24 @@ function LoafCard({
         )}
       </div>
 
+      {/* Cross Section */}
+      <div>
+        <div className="text-gray-700 text-sm font-medium mb-2">Cross Section</div>
+        <div className="flex items-center gap-3">
+          <CrossSectionInput
+            label="Width"
+            value={loaf.crossSectionWidth}
+            onUpdate={(v) => onUpdate({ crossSectionWidth: v })}
+          />
+          <span className="text-gray-400">×</span>
+          <CrossSectionInput
+            label="Height"
+            value={loaf.crossSectionHeight}
+            onUpdate={(v) => onUpdate({ crossSectionHeight: v })}
+          />
+        </div>
+      </div>
+
       {/* Notes */}
       <div>
         <label className="text-gray-700 text-sm font-medium block mb-2">Notes</label>
@@ -744,6 +764,38 @@ function IngredientRow({
           placeholder={secondaryPlaceholder}
         />
       )}
+    </div>
+  );
+}
+
+function CrossSectionInput({
+  label,
+  value,
+  onUpdate,
+}: {
+  label: string;
+  value: number | null;
+  onUpdate: (v: number | null) => void;
+}) {
+  const [localValue, setLocalValue] = useState(value?.toString() || "");
+
+  useEffect(() => {
+    setLocalValue(value?.toString() || "");
+  }, [value]);
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-gray-500 text-sm">{label}</span>
+      <input
+        type="number"
+        step="0.1"
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        onBlur={() => onUpdate(localValue ? parseFloat(localValue) : null)}
+        className="w-20 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder="0"
+      />
+      <span className="text-gray-400 text-sm">in</span>
     </div>
   );
 }

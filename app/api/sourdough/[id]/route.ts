@@ -51,6 +51,8 @@ export async function PUT(
         bakeEvents: body.bakeEvents,
         bakeEndTime: body.bakeEndTime,
         bakeEndDate: body.bakeEndDate,
+        crossSectionWidth: body.crossSectionWidth,
+        crossSectionHeight: body.crossSectionHeight,
         notes: body.notes,
       },
     });

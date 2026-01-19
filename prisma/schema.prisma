@@ -70,6 +70,8 @@ model SourdoughLoaf {
   bakeEvents      Json?    // Array of {time, temp, date?}, e.g., [{"time": "14:00", "temp": 450, "date": "2024-01-15"}]
   bakeEndTime     String?  @db.VarChar(50)  // Time loaf was removed from oven
   bakeEndDate     String?  @db.VarChar(50)  // Date loaf was removed (if different from loaf date)
+  crossSectionWidth  Float?  // Width of cross section in inches
+  crossSectionHeight Float?  // Height of cross section in inches
   notes           String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

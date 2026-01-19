@@ -74,6 +74,8 @@ type SourdoughLoaf = {
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
+  crossSectionWidth: number | null;
+  crossSectionHeight: number | null;
   notes: string | null;
 };
 
@@ -336,6 +338,28 @@ export default function SourdoughPage() {
                           {loaf.bakeEndTime && (
                             <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
                               Out @ {formatTime(loaf.bakeEndTime)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Cross Section */}
+                  {(loaf.crossSectionWidth || loaf.crossSectionHeight) && (() => {
+                    const ratio = loaf.crossSectionWidth && loaf.crossSectionHeight
+                      ? (loaf.crossSectionHeight / loaf.crossSectionWidth).toFixed(2)
+                      : null;
+                    return (
+                      <div>
+                        <span className="text-slate-500 text-sm">Cross Section</span>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
+                            {loaf.crossSectionWidth || "?"}" × {loaf.crossSectionHeight || "?"}"
+                          </span>
+                          {ratio && (
+                            <span className="text-slate-400 text-sm">
+                              ({ratio} ratio)
                             </span>
                           )}
                         </div>
