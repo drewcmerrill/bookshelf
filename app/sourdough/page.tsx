@@ -20,6 +20,7 @@ export default function SourdoughPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   // Form state
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -74,6 +75,7 @@ export default function SourdoughPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError("");
 
     try {
       const res = await fetch("/api/sourdough", {
@@ -95,9 +97,13 @@ export default function SourdoughPage() {
         resetForm();
         setShowForm(false);
         fetchLoaves();
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to save loaf");
       }
-    } catch (error) {
-      console.error("Failed to save loaf:", error);
+    } catch (err) {
+      console.error("Failed to save loaf:", err);
+      setError("Failed to save loaf");
     } finally {
       setSaving(false);
     }
@@ -328,6 +334,12 @@ export default function SourdoughPage() {
                 placeholder="How did it turn out?"
               />
             </div>
+
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"
