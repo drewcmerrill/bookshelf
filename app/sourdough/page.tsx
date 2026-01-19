@@ -10,6 +10,30 @@ function formatTime(time: string): string {
   return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
 
+function getMinutesBetween(start: string, end: string): number {
+  const [startHours, startMins] = start.split(":").map(Number);
+  const [endHours, endMins] = end.split(":").map(Number);
+  const startTotal = startHours * 60 + startMins;
+  const endTotal = endHours * 60 + endMins;
+  // Handle overnight (if end is earlier than start, assume next day)
+  if (endTotal < startTotal) {
+    return (24 * 60 - startTotal) + endTotal;
+  }
+  return endTotal - startTotal;
+}
+
+function formatDuration(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (mins === 0) {
+    return `${hours} hr`;
+  }
+  return `${hours} hr ${mins} min`;
+}
+
 type BakeEvent = {
   time: string;
   temp: number;
@@ -140,71 +164,131 @@ export default function SourdoughPage() {
                   {loaf.stretchFolds && loaf.stretchFolds.length > 0 && (
                     <div>
                       <span className="text-slate-500 text-sm">Stretch & Folds</span>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {loaf.stretchFolds.map((time, index) => (
-                          <span
-                            key={index}
-                            className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
-                          >
-                            {formatTime(time)}
-                          </span>
-                        ))}
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        {loaf.stretchFolds.map((time, idx) => {
+                          const prevTime = idx === 0 ? loaf.initialMixTime : loaf.stretchFolds![idx - 1];
+                          const duration = getMinutesBetween(prevTime, time);
+                          return (
+                            <div key={idx} className="flex items-center gap-2">
+                              {idx > 0 && (
+                                <span className="text-slate-400 text-xs">+{formatDuration(duration)}</span>
+                              )}
+                              <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
+                                {formatTime(time)}
+                                {idx === 0 && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    (+{formatDuration(duration)} from mix)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
 
                   {/* Proofing */}
-                  {(loaf.firstProofTime || loaf.secondProofTime) && (
-                    <div className="space-y-1 text-sm">
-                      <span className="text-slate-500">Proofing</span>
-                      <div className="flex flex-wrap gap-3 mt-1">
-                        {loaf.firstProofTime && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-slate-500">1st:</span>
-                            <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
-                              {formatTime(loaf.firstProofTime)}
-                              {loaf.firstProofLocation && (
-                                <span className="text-slate-500 ml-1">({loaf.firstProofLocation})</span>
-                              )}
-                            </span>
-                          </div>
-                        )}
-                        {loaf.secondProofTime && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-slate-500">2nd:</span>
-                            <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
-                              {formatTime(loaf.secondProofTime)}
-                              {loaf.secondProofLocation && (
-                                <span className="text-slate-500 ml-1">({loaf.secondProofLocation})</span>
-                              )}
-                            </span>
-                          </div>
-                        )}
+                  {(loaf.firstProofTime || loaf.secondProofTime) && (() => {
+                    const bakeStart = loaf.bakeEvents?.[0]?.time;
+                    const firstProofEnd = loaf.secondProofTime || bakeStart;
+                    const firstProofDuration = loaf.firstProofTime && firstProofEnd
+                      ? getMinutesBetween(loaf.firstProofTime, firstProofEnd)
+                      : null;
+                    const secondProofDuration = loaf.secondProofTime && bakeStart
+                      ? getMinutesBetween(loaf.secondProofTime, bakeStart)
+                      : null;
+
+                    return (
+                      <div className="space-y-1 text-sm">
+                        <span className="text-slate-500">Proofing</span>
+                        <div className="flex flex-wrap gap-3 mt-1">
+                          {loaf.firstProofTime && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-500">1st:</span>
+                              <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
+                                {formatTime(loaf.firstProofTime)}
+                                {loaf.firstProofLocation && (
+                                  <span className="text-slate-500 ml-1">({loaf.firstProofLocation})</span>
+                                )}
+                                {firstProofDuration && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    — {formatDuration(firstProofDuration)}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          {loaf.secondProofTime && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-500">2nd:</span>
+                              <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
+                                {formatTime(loaf.secondProofTime)}
+                                {loaf.secondProofLocation && (
+                                  <span className="text-slate-500 ml-1">({loaf.secondProofLocation})</span>
+                                )}
+                                {secondProofDuration && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    — {formatDuration(secondProofDuration)}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Baking */}
-                  {loaf.bakeEvents && loaf.bakeEvents.length > 0 && (
-                    <div>
-                      <span className="text-slate-500 text-sm">Baking</span>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {loaf.bakeEvents.map((event, index) => (
-                          <span
-                            key={index}
-                            className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
-                          >
-                            {formatTime(event.time)} @ {event.temp}°F
-                          </span>
-                        ))}
-                        {loaf.bakeEndTime && (
-                          <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
-                            Out @ {formatTime(loaf.bakeEndTime)}
-                          </span>
-                        )}
+                  {loaf.bakeEvents && loaf.bakeEvents.length > 0 && (() => {
+                    const events = loaf.bakeEvents!;
+                    const totalDuration = loaf.bakeEndTime
+                      ? getMinutesBetween(events[0].time, loaf.bakeEndTime)
+                      : null;
+
+                    return (
+                      <div>
+                        <span className="text-slate-500 text-sm">
+                          Baking
+                          {totalDuration && (
+                            <span className="text-slate-400 ml-1">
+                              ({formatDuration(totalDuration)} total)
+                            </span>
+                          )}
+                        </span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {events.map((event, idx) => {
+                            const nextTime = idx < events.length - 1
+                              ? events[idx + 1].time
+                              : loaf.bakeEndTime;
+                            const duration = nextTime
+                              ? getMinutesBetween(event.time, nextTime)
+                              : null;
+
+                            return (
+                              <span
+                                key={idx}
+                                className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
+                              >
+                                {event.temp}°F
+                                {duration && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    for {formatDuration(duration)}
+                                  </span>
+                                )}
+                              </span>
+                            );
+                          })}
+                          {loaf.bakeEndTime && (
+                            <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
+                              Out @ {formatTime(loaf.bakeEndTime)}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Notes */}
                   {loaf.notes && (
