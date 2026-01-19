@@ -62,6 +62,7 @@ type SourdoughLoaf = {
   id: number;
   date: string;
   initialMixTime: string;
+  temperature: number | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
@@ -156,6 +157,9 @@ export default function SourdoughPage() {
                     </div>
                     <div className="text-slate-500 text-sm">
                       Mixed at {formatTime(loaf.initialMixTime)}
+                      {loaf.temperature && (
+                        <span className="ml-2">• {loaf.temperature}°F outside</span>
+                      )}
                     </div>
                   </div>
 

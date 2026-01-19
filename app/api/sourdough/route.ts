@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
       data: {
         date: body.date ? new Date(body.date) : new Date(),
         initialMixTime: body.initialMixTime,
+        temperature: body.temperature || null,
         flourGrams: body.flourGrams || null,
         flourType: body.flourType || null,
         waterGrams: body.waterGrams || null,

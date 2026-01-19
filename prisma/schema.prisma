@@ -58,6 +58,7 @@ model SourdoughLoaf {
   id              Int      @id @default(autoincrement())
   date            DateTime @default(now())
   initialMixTime  String   @db.VarChar(50)  // e.g., "9:30 AM"
+  temperature     Int?     // Outside temperature in °F at time of mix
   flourGrams      Int?
   flourType       String?  @db.VarChar(255)
   waterGrams      Int?

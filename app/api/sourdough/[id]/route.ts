@@ -39,6 +39,7 @@ export async function PUT(
       data: {
         date: body.date ? new Date(body.date) : undefined,
         initialMixTime: body.initialMixTime,
+        temperature: body.temperature,
         flourGrams: body.flourGrams,
         flourType: body.flourType,
         waterGrams: body.waterGrams,

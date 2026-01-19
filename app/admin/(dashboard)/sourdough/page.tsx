@@ -76,6 +76,7 @@ type SourdoughLoaf = {
   id: number;
   date: string;
   initialMixTime: string;
+  temperature: number | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
@@ -120,11 +121,28 @@ export default function AdminSourdoughPage() {
     fetchLoaves();
   }, []);
 
+  const fetchGilbertTemperature = async (): Promise<number | null> => {
+    try {
+      // Gilbert, AZ coordinates: 33.3528° N, 111.7890° W
+      const res = await fetch(
+        "https://api.open-meteo.com/v1/forecast?latitude=33.3528&longitude=-111.789&current=temperature_2m&temperature_unit=fahrenheit"
+      );
+      if (res.ok) {
+        const data = await res.json();
+        return Math.round(data.current.temperature_2m);
+      }
+    } catch (error) {
+      console.error("Failed to fetch temperature:", error);
+    }
+    return null;
+  };
+
   const startNewLoaf = async () => {
     setSaving(true);
     try {
       const now = new Date();
       const time = now.toTimeString().slice(0, 5);
+      const temperature = await fetchGilbertTemperature();
 
       const res = await fetch("/api/sourdough", {
         method: "POST",
@@ -132,6 +150,7 @@ export default function AdminSourdoughPage() {
         body: JSON.stringify({
           date: now.toISOString(),
           initialMixTime: time,
+          temperature,
         }),
       });
 
@@ -316,6 +335,9 @@ function LoafCard({
               time={loaf.initialMixTime}
               onUpdate={(time) => onUpdate({ initialMixTime: time })}
             />
+            {loaf.temperature && (
+              <span className="ml-2">• {loaf.temperature}°F outside</span>
+            )}
           </div>
         </div>
         <button
