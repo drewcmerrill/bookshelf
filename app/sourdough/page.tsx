@@ -25,7 +25,9 @@ type SourdoughLoaf = {
   starterGrams: number | null;
   stretchFolds: string[] | null;
   firstProofTime: string | null;
+  firstProofLocation: string | null;
   secondProofTime: string | null;
+  secondProofLocation: string | null;
   bakeEvents: BakeEvent[] | null;
   notes: string | null;
 };
@@ -160,6 +162,9 @@ export default function SourdoughPage() {
                             <span className="text-slate-500">1st:</span>
                             <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
                               {formatTime(loaf.firstProofTime)}
+                              {loaf.firstProofLocation && (
+                                <span className="text-slate-500 ml-1">({loaf.firstProofLocation})</span>
+                              )}
                             </span>
                           </div>
                         )}
@@ -168,6 +173,9 @@ export default function SourdoughPage() {
                             <span className="text-slate-500">2nd:</span>
                             <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
                               {formatTime(loaf.secondProofTime)}
+                              {loaf.secondProofLocation && (
+                                <span className="text-slate-500 ml-1">({loaf.secondProofLocation})</span>
+                              )}
                             </span>
                           </div>
                         )}

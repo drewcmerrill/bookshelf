@@ -25,10 +25,18 @@ type SourdoughLoaf = {
   starterGrams: number | null;
   stretchFolds: string[] | null;
   firstProofTime: string | null;
+  firstProofLocation: string | null;
   secondProofTime: string | null;
+  secondProofLocation: string | null;
   bakeEvents: BakeEvent[] | null;
   notes: string | null;
 };
+
+const PROOF_LOCATIONS = [
+  { value: "counter", label: "Counter" },
+  { value: "oven", label: "Oven" },
+  { value: "fridge", label: "Fridge" },
+];
 
 export default function AdminSourdoughPage() {
   const [loaves, setLoaves] = useState<SourdoughLoaf[]>([]);
@@ -194,10 +202,21 @@ function LoafCard({
     onUpdate({ stretchFolds: folds });
   };
 
-  const setProofTime = (field: "firstProofTime" | "secondProofTime") => {
+  const setProofTime = (
+    timeField: "firstProofTime" | "secondProofTime",
+    locationField: "firstProofLocation" | "secondProofLocation",
+    location: string
+  ) => {
     const now = new Date();
     const time = now.toTimeString().slice(0, 5);
-    onUpdate({ [field]: time });
+    onUpdate({ [timeField]: time, [locationField]: location });
+  };
+
+  const clearProof = (
+    timeField: "firstProofTime" | "secondProofTime",
+    locationField: "firstProofLocation" | "secondProofLocation"
+  ) => {
+    onUpdate({ [timeField]: null, [locationField]: null });
   };
 
   const addBakeEvent = () => {
@@ -314,26 +333,34 @@ function LoafCard({
       {/* Proofing */}
       <div>
         <div className="text-gray-700 text-sm font-medium mb-2">Proofing</div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-gray-600 text-sm w-24">First Proof</span>
             {loaf.firstProofTime ? (
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
                 {formatTime(loaf.firstProofTime)}
+                {loaf.firstProofLocation && (
+                  <span className="text-gray-500">({loaf.firstProofLocation})</span>
+                )}
                 <button
-                  onClick={() => onUpdate({ firstProofTime: null })}
+                  onClick={() => clearProof("firstProofTime", "firstProofLocation")}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
                 </button>
               </span>
             ) : (
-              <button
-                onClick={() => setProofTime("firstProofTime")}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
-              >
-                Start Now
-              </button>
+              <div className="flex gap-2">
+                {PROOF_LOCATIONS.map((loc) => (
+                  <button
+                    key={loc.value}
+                    onClick={() => setProofTime("firstProofTime", "firstProofLocation", loc.value)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -341,20 +368,28 @@ function LoafCard({
             {loaf.secondProofTime ? (
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
                 {formatTime(loaf.secondProofTime)}
+                {loaf.secondProofLocation && (
+                  <span className="text-gray-500">({loaf.secondProofLocation})</span>
+                )}
                 <button
-                  onClick={() => onUpdate({ secondProofTime: null })}
+                  onClick={() => clearProof("secondProofTime", "secondProofLocation")}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
                 </button>
               </span>
             ) : (
-              <button
-                onClick={() => setProofTime("secondProofTime")}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
-              >
-                Start Now
-              </button>
+              <div className="flex gap-2">
+                {PROOF_LOCATIONS.map((loc) => (
+                  <button
+                    key={loc.value}
+                    onClick={() => setProofTime("secondProofTime", "secondProofLocation", loc.value)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>

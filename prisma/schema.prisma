@@ -63,8 +63,10 @@ model SourdoughLoaf {
   waterGrams      Int?
   starterGrams    Int?
   stretchFolds    Json?    // Array of times, e.g., ["10:00", "10:30", "11:00"]
-  firstProofTime  String?  @db.VarChar(50)  // Time first proof started
-  secondProofTime String?  @db.VarChar(50)  // Time second proof started
+  firstProofTime     String?  @db.VarChar(50)  // Time first proof started
+  firstProofLocation String?  @db.VarChar(50)  // "oven", "counter", or "fridge"
+  secondProofTime    String?  @db.VarChar(50)  // Time second proof started
+  secondProofLocation String? @db.VarChar(50)  // "oven", "counter", or "fridge"
   bakeEvents      Json?    // Array of {time, temp}, e.g., [{"time": "14:00", "temp": 450}, {"time": "14:20", "temp": 400}]
   notes           String?  @db.Text
   createdAt       DateTime @default(now())
