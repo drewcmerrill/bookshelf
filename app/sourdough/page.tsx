@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+function formatTime(time: string): string {
+  const [hours, minutes] = time.split(":").map(Number);
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours % 12 || 12;
+  return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+}
+
 type BakeEvent = {
   time: string;
   temp: number;
@@ -81,8 +88,9 @@ export default function SourdoughPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {loaves.map((loaf) => {
+            {loaves.map((loaf, index) => {
               const hydration = calculateHydration(loaf.waterGrams, loaf.flourGrams);
+              const loafNumber = loaves.length - index;
               return (
                 <div
                   key={loaf.id}
@@ -91,14 +99,14 @@ export default function SourdoughPage() {
                   {/* Header */}
                   <div>
                     <div className="text-slate-900 font-medium">
-                      {new Date(loaf.date).toLocaleDateString("en-US", {
+                      Loaf {loafNumber} — {new Date(loaf.date).toLocaleDateString("en-US", {
                         weekday: "short",
                         month: "short",
                         day: "numeric",
                       })}
                     </div>
                     <div className="text-slate-500 text-sm">
-                      Mixed at {loaf.initialMixTime}
+                      Mixed at {formatTime(loaf.initialMixTime)}
                     </div>
                   </div>
 
@@ -135,7 +143,7 @@ export default function SourdoughPage() {
                             key={index}
                             className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
                           >
-                            {time}
+                            {formatTime(time)}
                           </span>
                         ))}
                       </div>
@@ -151,7 +159,7 @@ export default function SourdoughPage() {
                           <div className="flex items-center gap-2">
                             <span className="text-slate-500">1st:</span>
                             <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
-                              {loaf.firstProofTime}
+                              {formatTime(loaf.firstProofTime)}
                             </span>
                           </div>
                         )}
@@ -159,7 +167,7 @@ export default function SourdoughPage() {
                           <div className="flex items-center gap-2">
                             <span className="text-slate-500">2nd:</span>
                             <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
-                              {loaf.secondProofTime}
+                              {formatTime(loaf.secondProofTime)}
                             </span>
                           </div>
                         )}
@@ -177,7 +185,7 @@ export default function SourdoughPage() {
                             key={index}
                             className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
                           >
-                            {event.time} @ {event.temp}°F
+                            {formatTime(event.time)} @ {event.temp}°F
                           </span>
                         ))}
                       </div>

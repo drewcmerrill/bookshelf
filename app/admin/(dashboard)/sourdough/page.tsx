@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+function formatTime(time: string): string {
+  const [hours, minutes] = time.split(":").map(Number);
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours % 12 || 12;
+  return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+}
+
 type BakeEvent = {
   time: string;
   temp: number;
@@ -144,10 +151,11 @@ export default function AdminSourdoughPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {loaves.map((loaf) => (
+          {loaves.map((loaf, index) => (
             <LoafCard
               key={loaf.id}
               loaf={loaf}
+              loafNumber={loaves.length - index}
               onUpdate={(updates) => updateLoaf(loaf.id, updates)}
               onDelete={() => deleteLoaf(loaf.id)}
               calculateHydration={calculateHydration}
@@ -161,11 +169,13 @@ export default function AdminSourdoughPage() {
 
 function LoafCard({
   loaf,
+  loafNumber,
   onUpdate,
   onDelete,
   calculateHydration,
 }: {
   loaf: SourdoughLoaf;
+  loafNumber: number;
   onUpdate: (updates: Partial<SourdoughLoaf>) => void;
   onDelete: () => void;
   calculateHydration: (water: number | null, flour: number | null) => number | null;
@@ -214,14 +224,14 @@ function LoafCard({
       <div className="flex justify-between items-start">
         <div>
           <div className="text-gray-900 font-semibold text-lg">
-            {new Date(loaf.date).toLocaleDateString("en-US", {
+            Loaf {loafNumber} — {new Date(loaf.date).toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",
               day: "numeric",
             })}
           </div>
           <div className="text-gray-500 text-sm">
-            Mixed at {loaf.initialMixTime}
+            Mixed at {formatTime(loaf.initialMixTime)}
           </div>
         </div>
         <button
@@ -286,7 +296,7 @@ function LoafCard({
                 key={index}
                 className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2"
               >
-                {time}
+                {formatTime(time)}
                 <button
                   onClick={() => removeStretchFold(index)}
                   className="text-gray-400 hover:text-gray-600"
@@ -309,7 +319,7 @@ function LoafCard({
             <span className="text-gray-600 text-sm w-24">First Proof</span>
             {loaf.firstProofTime ? (
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                {loaf.firstProofTime}
+                {formatTime(loaf.firstProofTime)}
                 <button
                   onClick={() => onUpdate({ firstProofTime: null })}
                   className="text-gray-400 hover:text-gray-600"
@@ -330,7 +340,7 @@ function LoafCard({
             <span className="text-gray-600 text-sm w-24">Second Proof</span>
             {loaf.secondProofTime ? (
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                {loaf.secondProofTime}
+                {formatTime(loaf.secondProofTime)}
                 <button
                   onClick={() => onUpdate({ secondProofTime: null })}
                   className="text-gray-400 hover:text-gray-600"
@@ -418,7 +428,7 @@ function BakeEventRow({
     <div className="flex items-center gap-2">
       <span className="text-gray-500 text-sm w-8">{index === 0 ? "In" : `${index + 1}.`}</span>
       <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm">
-        {event.time}
+        {formatTime(event.time)}
       </span>
       <span className="text-gray-500 text-sm">at</span>
       <input
