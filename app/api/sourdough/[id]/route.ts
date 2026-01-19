@@ -44,6 +44,9 @@ export async function PUT(
         waterGrams: body.waterGrams,
         starterGrams: body.starterGrams,
         stretchFolds: body.stretchFolds,
+        firstProofTime: body.firstProofTime,
+        secondProofTime: body.secondProofTime,
+        bakeEvents: body.bakeEvents,
         notes: body.notes,
       },
     });
