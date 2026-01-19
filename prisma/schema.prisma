@@ -68,6 +68,7 @@ model SourdoughLoaf {
   secondProofTime    String?  @db.VarChar(50)  // Time second proof started
   secondProofLocation String? @db.VarChar(50)  // "oven", "counter", or "fridge"
   bakeEvents      Json?    // Array of {time, temp}, e.g., [{"time": "14:00", "temp": 450}, {"time": "14:20", "temp": 400}]
+  bakeEndTime     String?  @db.VarChar(50)  // Time loaf was removed from oven
   notes           String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

@@ -29,6 +29,7 @@ type SourdoughLoaf = {
   secondProofTime: string | null;
   secondProofLocation: string | null;
   bakeEvents: BakeEvent[] | null;
+  bakeEndTime: string | null;
   notes: string | null;
 };
 
@@ -196,6 +197,11 @@ export default function SourdoughPage() {
                             {formatTime(event.time)} @ {event.temp}°F
                           </span>
                         ))}
+                        {loaf.bakeEndTime && (
+                          <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
+                            Out @ {formatTime(loaf.bakeEndTime)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )}

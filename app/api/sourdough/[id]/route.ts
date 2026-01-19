@@ -49,6 +49,7 @@ export async function PUT(
         secondProofTime: body.secondProofTime,
         secondProofLocation: body.secondProofLocation,
         bakeEvents: body.bakeEvents,
+        bakeEndTime: body.bakeEndTime,
         notes: body.notes,
       },
     });

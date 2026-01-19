@@ -29,6 +29,7 @@ type SourdoughLoaf = {
   secondProofTime: string | null;
   secondProofLocation: string | null;
   bakeEvents: BakeEvent[] | null;
+  bakeEndTime: string | null;
   notes: string | null;
 };
 
@@ -420,6 +421,32 @@ function LoafCard({
                 onRemove={() => removeBakeEvent(index)}
               />
             ))}
+            {/* Remove from Oven */}
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-gray-500 text-sm w-8">Out</span>
+              {loaf.bakeEndTime ? (
+                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                  {formatTime(loaf.bakeEndTime)}
+                  <button
+                    onClick={() => onUpdate({ bakeEndTime: null })}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              ) : (
+                <button
+                  onClick={() => {
+                    const now = new Date();
+                    const time = now.toTimeString().slice(0, 5);
+                    onUpdate({ bakeEndTime: time });
+                  }}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Remove Now
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="text-gray-400 text-sm">Not started</div>
