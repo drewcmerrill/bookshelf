@@ -298,7 +298,7 @@ export default function SourdoughPage() {
                     return (
                       <div>
                         <span className="text-slate-500 text-sm">
-                          Baking
+                          Baking — In @ {formatTime(events[0].time)}
                           {bakeSpansMultipleDays && (
                             <span className="text-slate-400 ml-1">(next day)</span>
                           )}
