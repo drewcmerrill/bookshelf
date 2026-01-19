@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+type BakeEvent = {
+  time: string;
+  temp: number;
+};
+
 type SourdoughLoaf = {
   id: number;
   date: string;
@@ -12,6 +17,9 @@ type SourdoughLoaf = {
   waterGrams: number | null;
   starterGrams: number | null;
   stretchFolds: string[] | null;
+  firstProofTime: string | null;
+  secondProofTime: string | null;
+  bakeEvents: BakeEvent[] | null;
   notes: string | null;
 };
 
@@ -48,11 +56,6 @@ export default function AdminSourdoughPage() {
         body: JSON.stringify({
           date: now.toISOString(),
           initialMixTime: time,
-          flourGrams: 0,
-          flourType: "",
-          waterGrams: 0,
-          starterGrams: 0,
-          stretchFolds: [],
         }),
       });
 
@@ -77,18 +80,6 @@ export default function AdminSourdoughPage() {
     } catch (error) {
       console.error("Failed to update loaf:", error);
     }
-  };
-
-  const addStretchFold = async (loaf: SourdoughLoaf) => {
-    const now = new Date();
-    const time = now.toTimeString().slice(0, 5);
-    const folds = [...(loaf.stretchFolds || []), time];
-    await updateLoaf(loaf.id, { stretchFolds: folds });
-  };
-
-  const removeStretchFold = async (loaf: SourdoughLoaf, index: number) => {
-    const folds = (loaf.stretchFolds || []).filter((_, i) => i !== index);
-    await updateLoaf(loaf.id, { stretchFolds: folds });
   };
 
   const deleteLoaf = async (id: number) => {
@@ -158,8 +149,6 @@ export default function AdminSourdoughPage() {
               key={loaf.id}
               loaf={loaf}
               onUpdate={(updates) => updateLoaf(loaf.id, updates)}
-              onAddFold={() => addStretchFold(loaf)}
-              onRemoveFold={(index) => removeStretchFold(loaf, index)}
               onDelete={() => deleteLoaf(loaf.id)}
               calculateHydration={calculateHydration}
             />
@@ -173,22 +162,54 @@ export default function AdminSourdoughPage() {
 function LoafCard({
   loaf,
   onUpdate,
-  onAddFold,
-  onRemoveFold,
   onDelete,
   calculateHydration,
 }: {
   loaf: SourdoughLoaf;
   onUpdate: (updates: Partial<SourdoughLoaf>) => void;
-  onAddFold: () => void;
-  onRemoveFold: (index: number) => void;
   onDelete: () => void;
   calculateHydration: (water: number | null, flour: number | null) => number | null;
 }) {
   const hydration = calculateHydration(loaf.waterGrams, loaf.flourGrams);
 
+  const addStretchFold = () => {
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 5);
+    const folds = [...(loaf.stretchFolds || []), time];
+    onUpdate({ stretchFolds: folds });
+  };
+
+  const removeStretchFold = (index: number) => {
+    const folds = (loaf.stretchFolds || []).filter((_, i) => i !== index);
+    onUpdate({ stretchFolds: folds });
+  };
+
+  const setProofTime = (field: "firstProofTime" | "secondProofTime") => {
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 5);
+    onUpdate({ [field]: time });
+  };
+
+  const addBakeEvent = () => {
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 5);
+    const events = [...(loaf.bakeEvents || []), { time, temp: 450 }];
+    onUpdate({ bakeEvents: events });
+  };
+
+  const updateBakeEvent = (index: number, updates: Partial<BakeEvent>) => {
+    const events = [...(loaf.bakeEvents || [])];
+    events[index] = { ...events[index], ...updates };
+    onUpdate({ bakeEvents: events });
+  };
+
+  const removeBakeEvent = (index: number) => {
+    const events = (loaf.bakeEvents || []).filter((_, i) => i !== index);
+    onUpdate({ bakeEvents: events });
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 shadow-sm">
+    <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-5 shadow-sm">
       {/* Header Row */}
       <div className="flex justify-between items-start">
         <div>
@@ -200,7 +221,7 @@ function LoafCard({
             })}
           </div>
           <div className="text-gray-500 text-sm">
-            Started at {loaf.initialMixTime}
+            Mixed at {loaf.initialMixTime}
           </div>
         </div>
         <button
@@ -213,8 +234,9 @@ function LoafCard({
         </button>
       </div>
 
-      {/* Ingredient Rows */}
+      {/* Ingredients Section */}
       <div className="space-y-3">
+        <div className="text-gray-700 text-sm font-medium">Ingredients</div>
         <IngredientRow
           label="Flour"
           value={loaf.flourGrams}
@@ -236,21 +258,19 @@ function LoafCard({
           unit="g"
           onValueChange={(v) => onUpdate({ starterGrams: v })}
         />
+        {hydration !== null && hydration > 0 && (
+          <div className="text-gray-500 text-sm pl-[76px]">
+            Hydration: {hydration}%
+          </div>
+        )}
       </div>
-
-      {/* Hydration */}
-      {hydration !== null && hydration > 0 && (
-        <div className="text-gray-600 text-sm font-medium">
-          Hydration: {hydration}%
-        </div>
-      )}
 
       {/* Stretch & Folds */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-600 text-sm font-medium">Stretch & Folds</span>
+          <span className="text-gray-700 text-sm font-medium">Stretch & Folds</span>
           <button
-            onClick={onAddFold}
+            onClick={addStretchFold}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,7 +288,7 @@ function LoafCard({
               >
                 {time}
                 <button
-                  onClick={() => onRemoveFold(index)}
+                  onClick={() => removeStretchFold(index)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
@@ -281,9 +301,89 @@ function LoafCard({
         )}
       </div>
 
+      {/* Proofing */}
+      <div>
+        <div className="text-gray-700 text-sm font-medium mb-2">Proofing</div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <span className="text-gray-600 text-sm w-24">First Proof</span>
+            {loaf.firstProofTime ? (
+              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                {loaf.firstProofTime}
+                <button
+                  onClick={() => onUpdate({ firstProofTime: null })}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </span>
+            ) : (
+              <button
+                onClick={() => setProofTime("firstProofTime")}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Start Now
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-gray-600 text-sm w-24">Second Proof</span>
+            {loaf.secondProofTime ? (
+              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                {loaf.secondProofTime}
+                <button
+                  onClick={() => onUpdate({ secondProofTime: null })}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </span>
+            ) : (
+              <button
+                onClick={() => setProofTime("secondProofTime")}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Start Now
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Baking */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-gray-700 text-sm font-medium">Baking</span>
+          <button
+            onClick={addBakeEvent}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add
+          </button>
+        </div>
+        {loaf.bakeEvents && loaf.bakeEvents.length > 0 ? (
+          <div className="space-y-2">
+            {loaf.bakeEvents.map((event, index) => (
+              <BakeEventRow
+                key={index}
+                event={event}
+                index={index}
+                onUpdate={(updates) => updateBakeEvent(index, updates)}
+                onRemove={() => removeBakeEvent(index)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-gray-400 text-sm">Not started</div>
+        )}
+      </div>
+
       {/* Notes */}
       <div>
-        <label className="text-gray-600 text-sm font-medium block mb-2">Notes</label>
+        <label className="text-gray-700 text-sm font-medium block mb-2">Notes</label>
         <textarea
           value={loaf.notes || ""}
           onChange={(e) => onUpdate({ notes: e.target.value || null })}
@@ -293,6 +393,48 @@ function LoafCard({
           placeholder="How did it turn out?"
         />
       </div>
+    </div>
+  );
+}
+
+function BakeEventRow({
+  event,
+  index,
+  onUpdate,
+  onRemove,
+}: {
+  event: BakeEvent;
+  index: number;
+  onUpdate: (updates: Partial<BakeEvent>) => void;
+  onRemove: () => void;
+}) {
+  const [localTemp, setLocalTemp] = useState(event.temp.toString());
+
+  useEffect(() => {
+    setLocalTemp(event.temp.toString());
+  }, [event.temp]);
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-gray-500 text-sm w-8">{index === 0 ? "In" : `${index + 1}.`}</span>
+      <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm">
+        {event.time}
+      </span>
+      <span className="text-gray-500 text-sm">at</span>
+      <input
+        type="number"
+        value={localTemp}
+        onChange={(e) => setLocalTemp(e.target.value)}
+        onBlur={() => onUpdate({ temp: parseInt(localTemp) || 0 })}
+        className="w-20 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+      <span className="text-gray-500 text-sm">°F</span>
+      <button
+        onClick={onRemove}
+        className="text-gray-400 hover:text-gray-600 ml-auto"
+      >
+        ×
+      </button>
     </div>
   );
 }
@@ -327,7 +469,7 @@ function IngredientRow({
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-gray-600 text-sm w-16 font-medium">{label}</span>
+      <span className="text-gray-600 text-sm w-16">{label}</span>
       <input
         type="number"
         value={localValue}

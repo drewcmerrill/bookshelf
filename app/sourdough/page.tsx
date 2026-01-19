@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+type BakeEvent = {
+  time: string;
+  temp: number;
+};
+
 type SourdoughLoaf = {
   id: number;
   date: string;
@@ -12,6 +17,9 @@ type SourdoughLoaf = {
   waterGrams: number | null;
   starterGrams: number | null;
   stretchFolds: string[] | null;
+  firstProofTime: string | null;
+  secondProofTime: string | null;
+  bakeEvents: BakeEvent[] | null;
   notes: string | null;
 };
 
@@ -78,7 +86,7 @@ export default function SourdoughPage() {
               return (
                 <div
                   key={loaf.id}
-                  className="bg-white border border-slate-200 rounded-lg p-4 space-y-3 shadow-sm"
+                  className="bg-white border border-slate-200 rounded-lg p-4 space-y-4 shadow-sm"
                 >
                   {/* Header */}
                   <div>
@@ -90,7 +98,7 @@ export default function SourdoughPage() {
                       })}
                     </div>
                     <div className="text-slate-500 text-sm">
-                      Started at {loaf.initialMixTime}
+                      Mixed at {loaf.initialMixTime}
                     </div>
                   </div>
 
@@ -110,14 +118,12 @@ export default function SourdoughPage() {
                       <span className="text-slate-500 w-16">Starter</span>
                       <span className="text-slate-900">{loaf.starterGrams || 0}g</span>
                     </div>
+                    {hydration !== null && hydration > 0 && (
+                      <div className="text-slate-600 font-medium pt-1">
+                        Hydration: {hydration}%
+                      </div>
+                    )}
                   </div>
-
-                  {/* Hydration */}
-                  {hydration !== null && hydration > 0 && (
-                    <div className="text-slate-600 text-sm font-medium">
-                      Hydration: {hydration}%
-                    </div>
-                  )}
 
                   {/* Stretch & Folds */}
                   {loaf.stretchFolds && loaf.stretchFolds.length > 0 && (
@@ -130,6 +136,48 @@ export default function SourdoughPage() {
                             className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
                           >
                             {time}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Proofing */}
+                  {(loaf.firstProofTime || loaf.secondProofTime) && (
+                    <div className="space-y-1 text-sm">
+                      <span className="text-slate-500">Proofing</span>
+                      <div className="flex flex-wrap gap-3 mt-1">
+                        {loaf.firstProofTime && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-500">1st:</span>
+                            <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
+                              {loaf.firstProofTime}
+                            </span>
+                          </div>
+                        )}
+                        {loaf.secondProofTime && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-500">2nd:</span>
+                            <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
+                              {loaf.secondProofTime}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Baking */}
+                  {loaf.bakeEvents && loaf.bakeEvents.length > 0 && (
+                    <div>
+                      <span className="text-slate-500 text-sm">Baking</span>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {loaf.bakeEvents.map((event, index) => (
+                          <span
+                            key={index}
+                            className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
+                          >
+                            {event.time} @ {event.temp}°F
                           </span>
                         ))}
                       </div>
