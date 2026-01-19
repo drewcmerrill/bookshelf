@@ -11,7 +11,7 @@ type SourdoughLoaf = {
   flourType: string;
   waterGrams: number;
   starterGrams: number;
-  stretchFolds: string[];
+  stretchFolds: string[] | null;
   notes: string | null;
 };
 
@@ -36,7 +36,7 @@ export default function SourdoughPage() {
     try {
       const res = await fetch("/api/sourdough");
       const data = await res.json();
-      setLoaves(data.loaves);
+      setLoaves(data.loaves || []);
     } catch (error) {
       console.error("Failed to fetch loaves:", error);
     } finally {
@@ -418,7 +418,7 @@ export default function SourdoughPage() {
                   </div>
                 </div>
 
-                {loaf.stretchFolds.length > 0 && (
+                {loaf.stretchFolds && loaf.stretchFolds.length > 0 && (
                   <div className="mb-3">
                     <span className="text-white/50 text-sm">
                       Stretch & Folds ({loaf.stretchFolds.length}):
