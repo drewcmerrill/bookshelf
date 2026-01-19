@@ -882,10 +882,12 @@ function TempInput({
   placeholder?: string;
   compact?: boolean;
 }) {
-  const [localValue, setLocalValue] = useState(value?.toString() || "");
+  // Treat 0 as empty since 0°F indoor temp isn't realistic
+  const valueToString = (v: number | null) => (v && v !== 0) ? v.toString() : "";
+  const [localValue, setLocalValue] = useState(valueToString(value));
 
   useEffect(() => {
-    setLocalValue(value?.toString() || "");
+    setLocalValue(valueToString(value));
   }, [value]);
 
   if (compact) {
