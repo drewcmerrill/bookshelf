@@ -10,6 +10,62 @@ function formatTime(time: string): string {
   return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
 
+function EditableTime({
+  time,
+  onUpdate,
+  className = "",
+}: {
+  time: string;
+  onUpdate: (time: string) => void;
+  className?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [localTime, setLocalTime] = useState(time);
+
+  useEffect(() => {
+    setLocalTime(time);
+  }, [time]);
+
+  if (editing) {
+    return (
+      <input
+        type="time"
+        value={localTime}
+        onChange={(e) => setLocalTime(e.target.value)}
+        onBlur={() => {
+          if (localTime && localTime !== time) {
+            onUpdate(localTime);
+          }
+          setEditing(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            if (localTime && localTime !== time) {
+              onUpdate(localTime);
+            }
+            setEditing(false);
+          } else if (e.key === "Escape") {
+            setLocalTime(time);
+            setEditing(false);
+          }
+        }}
+        autoFocus
+        className={`bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      />
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setEditing(true)}
+      className="hover:bg-gray-200 rounded px-1 -mx-1 transition-colors"
+      title="Click to edit"
+    >
+      {formatTime(time)}
+    </button>
+  );
+}
+
 type BakeEvent = {
   time: string;
   temp: number;
@@ -250,8 +306,12 @@ function LoafCard({
               day: "numeric",
             })}
           </div>
-          <div className="text-gray-500 text-sm">
-            Mixed at {formatTime(loaf.initialMixTime)}
+          <div className="text-gray-500 text-sm flex items-center gap-1">
+            Mixed at{" "}
+            <EditableTime
+              time={loaf.initialMixTime}
+              onUpdate={(time) => onUpdate({ initialMixTime: time })}
+            />
           </div>
         </div>
         <button
@@ -316,7 +376,14 @@ function LoafCard({
                 key={index}
                 className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2"
               >
-                {formatTime(time)}
+                <EditableTime
+                  time={time}
+                  onUpdate={(newTime) => {
+                    const folds = [...(loaf.stretchFolds || [])];
+                    folds[index] = newTime;
+                    onUpdate({ stretchFolds: folds });
+                  }}
+                />
                 <button
                   onClick={() => removeStretchFold(index)}
                   className="text-gray-400 hover:text-gray-600"
@@ -339,9 +406,22 @@ function LoafCard({
             <span className="text-gray-600 text-sm w-24">First Proof</span>
             {loaf.firstProofTime ? (
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                {formatTime(loaf.firstProofTime)}
+                <EditableTime
+                  time={loaf.firstProofTime}
+                  onUpdate={(time) => onUpdate({ firstProofTime: time })}
+                />
                 {loaf.firstProofLocation && (
-                  <span className="text-gray-500">({loaf.firstProofLocation})</span>
+                  <select
+                    value={loaf.firstProofLocation}
+                    onChange={(e) => onUpdate({ firstProofLocation: e.target.value })}
+                    className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
+                  >
+                    {PROOF_LOCATIONS.map((loc) => (
+                      <option key={loc.value} value={loc.value}>
+                        ({loc.label})
+                      </option>
+                    ))}
+                  </select>
                 )}
                 <button
                   onClick={() => clearProof("firstProofTime", "firstProofLocation")}
@@ -368,9 +448,22 @@ function LoafCard({
             <span className="text-gray-600 text-sm w-24">Second Proof</span>
             {loaf.secondProofTime ? (
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                {formatTime(loaf.secondProofTime)}
+                <EditableTime
+                  time={loaf.secondProofTime}
+                  onUpdate={(time) => onUpdate({ secondProofTime: time })}
+                />
                 {loaf.secondProofLocation && (
-                  <span className="text-gray-500">({loaf.secondProofLocation})</span>
+                  <select
+                    value={loaf.secondProofLocation}
+                    onChange={(e) => onUpdate({ secondProofLocation: e.target.value })}
+                    className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
+                  >
+                    {PROOF_LOCATIONS.map((loc) => (
+                      <option key={loc.value} value={loc.value}>
+                        ({loc.label})
+                      </option>
+                    ))}
+                  </select>
                 )}
                 <button
                   onClick={() => clearProof("secondProofTime", "secondProofLocation")}
@@ -426,7 +519,10 @@ function LoafCard({
               <span className="text-gray-500 text-sm w-8">Out</span>
               {loaf.bakeEndTime ? (
                 <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                  {formatTime(loaf.bakeEndTime)}
+                  <EditableTime
+                    time={loaf.bakeEndTime}
+                    onUpdate={(time) => onUpdate({ bakeEndTime: time })}
+                  />
                   <button
                     onClick={() => onUpdate({ bakeEndTime: null })}
                     className="text-gray-400 hover:text-gray-600"
@@ -490,7 +586,10 @@ function BakeEventRow({
     <div className="flex items-center gap-2">
       <span className="text-gray-500 text-sm w-8">{index === 0 ? "In" : `${index + 1}.`}</span>
       <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm">
-        {formatTime(event.time)}
+        <EditableTime
+          time={event.time}
+          onUpdate={(time) => onUpdate({ time })}
+        />
       </span>
       <span className="text-gray-500 text-sm">at</span>
       <input
