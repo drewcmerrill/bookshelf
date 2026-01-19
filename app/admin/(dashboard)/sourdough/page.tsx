@@ -69,6 +69,7 @@ function EditableTime({
 type BakeEvent = {
   time: string;
   temp: number;
+  date?: string; // Optional date in YYYY-MM-DD format for next-day bakes
 };
 
 type SourdoughLoaf = {
@@ -86,6 +87,7 @@ type SourdoughLoaf = {
   secondProofLocation: string | null;
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
+  bakeEndDate: string | null;
   notes: string | null;
 };
 
@@ -510,39 +512,16 @@ function LoafCard({
                 key={index}
                 event={event}
                 index={index}
+                loafDate={loaf.date}
                 onUpdate={(updates) => updateBakeEvent(index, updates)}
                 onRemove={() => removeBakeEvent(index)}
               />
             ))}
             {/* Remove from Oven */}
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-gray-500 text-sm w-8">Out</span>
-              {loaf.bakeEndTime ? (
-                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                  <EditableTime
-                    time={loaf.bakeEndTime}
-                    onUpdate={(time) => onUpdate({ bakeEndTime: time })}
-                  />
-                  <button
-                    onClick={() => onUpdate({ bakeEndTime: null })}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    ×
-                  </button>
-                </span>
-              ) : (
-                <button
-                  onClick={() => {
-                    const now = new Date();
-                    const time = now.toTimeString().slice(0, 5);
-                    onUpdate({ bakeEndTime: time });
-                  }}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
-                >
-                  Remove Now
-                </button>
-              )}
-            </div>
+            <BakeEndRow
+              loaf={loaf}
+              onUpdate={onUpdate}
+            />
           </div>
         ) : (
           <div className="text-gray-400 text-sm">Not started</div>
@@ -565,32 +544,137 @@ function LoafCard({
   );
 }
 
+function BakeEndRow({
+  loaf,
+  onUpdate,
+}: {
+  loaf: SourdoughLoaf;
+  onUpdate: (updates: Partial<SourdoughLoaf>) => void;
+}) {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const loafDateStr = new Date(loaf.date).toISOString().split("T")[0];
+  const endDate = loaf.bakeEndDate || loafDateStr;
+  const isNextDay = endDate !== loafDateStr;
+
+  return (
+    <div className="flex items-center gap-2 pt-1 flex-wrap">
+      <span className="text-gray-500 text-sm w-8">Out</span>
+      {loaf.bakeEndTime ? (
+        <>
+          <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1">
+            <EditableTime
+              time={loaf.bakeEndTime}
+              onUpdate={(time) => onUpdate({ bakeEndTime: time })}
+            />
+            {isNextDay && (
+              <span className="text-gray-400 text-xs">(+1 day)</span>
+            )}
+          </span>
+          <button
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            className="text-gray-400 hover:text-gray-600 text-xs"
+            title="Change date"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
+          {showDatePicker && (
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                onUpdate({ bakeEndDate: e.target.value === loafDateStr ? null : e.target.value });
+                setShowDatePicker(false);
+              }}
+              className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
+          <button
+            onClick={() => onUpdate({ bakeEndTime: null, bakeEndDate: null })}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            ×
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={() => {
+            const now = new Date();
+            const time = now.toTimeString().slice(0, 5);
+            const todayStr = now.toISOString().split("T")[0];
+            onUpdate({
+              bakeEndTime: time,
+              bakeEndDate: todayStr !== loafDateStr ? todayStr : null
+            });
+          }}
+          className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
+        >
+          Remove Now
+        </button>
+      )}
+    </div>
+  );
+}
+
 function BakeEventRow({
   event,
   index,
+  loafDate,
   onUpdate,
   onRemove,
 }: {
   event: BakeEvent;
   index: number;
+  loafDate: string;
   onUpdate: (updates: Partial<BakeEvent>) => void;
   onRemove: () => void;
 }) {
   const [localTemp, setLocalTemp] = useState(event.temp.toString());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     setLocalTemp(event.temp.toString());
   }, [event.temp]);
 
+  // Format the loaf date for comparison
+  const loafDateStr = new Date(loafDate).toISOString().split("T")[0];
+  const eventDate = event.date || loafDateStr;
+  const isNextDay = eventDate !== loafDateStr;
+
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       <span className="text-gray-500 text-sm w-8">{index === 0 ? "In" : `${index + 1}.`}</span>
-      <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm">
+      <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1">
         <EditableTime
           time={event.time}
           onUpdate={(time) => onUpdate({ time })}
         />
+        {isNextDay && (
+          <span className="text-gray-400 text-xs">(+1 day)</span>
+        )}
       </span>
+      <button
+        onClick={() => setShowDatePicker(!showDatePicker)}
+        className="text-gray-400 hover:text-gray-600 text-xs"
+        title="Change date"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </button>
+      {showDatePicker && (
+        <input
+          type="date"
+          value={eventDate}
+          onChange={(e) => {
+            onUpdate({ date: e.target.value === loafDateStr ? undefined : e.target.value });
+            setShowDatePicker(false);
+          }}
+          className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      )}
       <span className="text-gray-500 text-sm">at</span>
       <input
         type="number"

@@ -22,6 +22,24 @@ function getMinutesBetween(start: string, end: string): number {
   return endTotal - startTotal;
 }
 
+function getMinutesBetweenWithDates(
+  startTime: string,
+  startDate: string,
+  endTime: string,
+  endDate: string
+): number {
+  const [startHours, startMins] = startTime.split(":").map(Number);
+  const [endHours, endMins] = endTime.split(":").map(Number);
+
+  const startDateTime = new Date(startDate);
+  startDateTime.setHours(startHours, startMins, 0, 0);
+
+  const endDateTime = new Date(endDate);
+  endDateTime.setHours(endHours, endMins, 0, 0);
+
+  return Math.round((endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60));
+}
+
 function formatDuration(minutes: number): string {
   if (minutes < 60) {
     return `${minutes} min`;
@@ -37,6 +55,7 @@ function formatDuration(minutes: number): string {
 type BakeEvent = {
   time: string;
   temp: number;
+  date?: string; // Optional date for next-day bakes
 };
 
 type SourdoughLoaf = {
@@ -54,6 +73,7 @@ type SourdoughLoaf = {
   secondProofLocation: string | null;
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
+  bakeEndDate: string | null;
   notes: string | null;
 };
 
@@ -190,14 +210,25 @@ export default function SourdoughPage() {
 
                   {/* Proofing */}
                   {(loaf.firstProofTime || loaf.secondProofTime) && (() => {
-                    const bakeStart = loaf.bakeEvents?.[0]?.time;
+                    const loafDateStr = new Date(loaf.date).toISOString().split("T")[0];
+                    const bakeEvent = loaf.bakeEvents?.[0];
+                    const bakeStart = bakeEvent?.time;
+                    const bakeDate = bakeEvent?.date || loafDateStr;
+
+                    // Calculate first proof duration (to second proof or bake start)
                     const firstProofEnd = loaf.secondProofTime || bakeStart;
+                    const firstProofEndDate = loaf.secondProofTime ? loafDateStr : bakeDate;
                     const firstProofDuration = loaf.firstProofTime && firstProofEnd
-                      ? getMinutesBetween(loaf.firstProofTime, firstProofEnd)
+                      ? getMinutesBetweenWithDates(loaf.firstProofTime, loafDateStr, firstProofEnd, firstProofEndDate)
                       : null;
+
+                    // Calculate second proof duration (to bake start, which may be next day)
                     const secondProofDuration = loaf.secondProofTime && bakeStart
-                      ? getMinutesBetween(loaf.secondProofTime, bakeStart)
+                      ? getMinutesBetweenWithDates(loaf.secondProofTime, loafDateStr, bakeStart, bakeDate)
                       : null;
+
+                    // Check if second proof is overnight
+                    const isOvernightProof = secondProofDuration && secondProofDuration > 8 * 60;
 
                     return (
                       <div className="space-y-1 text-sm">
@@ -211,7 +242,7 @@ export default function SourdoughPage() {
                                 {loaf.firstProofLocation && (
                                   <span className="text-slate-500 ml-1">({loaf.firstProofLocation})</span>
                                 )}
-                                {firstProofDuration && (
+                                {firstProofDuration && firstProofDuration > 0 && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     — {formatDuration(firstProofDuration)}
                                   </span>
@@ -227,9 +258,10 @@ export default function SourdoughPage() {
                                 {loaf.secondProofLocation && (
                                   <span className="text-slate-500 ml-1">({loaf.secondProofLocation})</span>
                                 )}
-                                {secondProofDuration && (
+                                {secondProofDuration && secondProofDuration > 0 && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     — {formatDuration(secondProofDuration)}
+                                    {isOvernightProof && " overnight"}
                                   </span>
                                 )}
                               </span>
@@ -243,27 +275,48 @@ export default function SourdoughPage() {
                   {/* Baking */}
                   {loaf.bakeEvents && loaf.bakeEvents.length > 0 && (() => {
                     const events = loaf.bakeEvents!;
+                    const loafDateStr = new Date(loaf.date).toISOString().split("T")[0];
+
+                    // Get date for each event (defaults to loaf date)
+                    const getEventDate = (event: BakeEvent) => event.date || loafDateStr;
+                    const endDate = loaf.bakeEndDate || loafDateStr;
+
+                    // Calculate total duration considering dates
                     const totalDuration = loaf.bakeEndTime
-                      ? getMinutesBetween(events[0].time, loaf.bakeEndTime)
+                      ? getMinutesBetweenWithDates(
+                          events[0].time,
+                          getEventDate(events[0]),
+                          loaf.bakeEndTime,
+                          endDate
+                        )
                       : null;
+
+                    // Check if baking spans multiple days
+                    const bakeSpansMultipleDays = events.some(e => e.date && e.date !== loafDateStr) ||
+                      (loaf.bakeEndDate && loaf.bakeEndDate !== loafDateStr);
 
                     return (
                       <div>
                         <span className="text-slate-500 text-sm">
                           Baking
-                          {totalDuration && (
+                          {bakeSpansMultipleDays && (
+                            <span className="text-slate-400 ml-1">(next day)</span>
+                          )}
+                          {totalDuration && totalDuration > 0 && (
                             <span className="text-slate-400 ml-1">
-                              ({formatDuration(totalDuration)} total)
+                              — {formatDuration(totalDuration)} total
                             </span>
                           )}
                         </span>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {events.map((event, idx) => {
-                            const nextTime = idx < events.length - 1
-                              ? events[idx + 1].time
-                              : loaf.bakeEndTime;
+                            const currentDate = getEventDate(event);
+                            const nextEvent = idx < events.length - 1 ? events[idx + 1] : null;
+                            const nextTime = nextEvent ? nextEvent.time : loaf.bakeEndTime;
+                            const nextDate = nextEvent ? getEventDate(nextEvent) : endDate;
+
                             const duration = nextTime
-                              ? getMinutesBetween(event.time, nextTime)
+                              ? getMinutesBetweenWithDates(event.time, currentDate, nextTime, nextDate)
                               : null;
 
                             return (
@@ -272,7 +325,7 @@ export default function SourdoughPage() {
                                 className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm"
                               >
                                 {event.temp}°F
-                                {duration && (
+                                {duration && duration > 0 && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     for {formatDuration(duration)}
                                   </span>

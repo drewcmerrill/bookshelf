@@ -50,6 +50,7 @@ export async function PUT(
         secondProofLocation: body.secondProofLocation,
         bakeEvents: body.bakeEvents,
         bakeEndTime: body.bakeEndTime,
+        bakeEndDate: body.bakeEndDate,
         notes: body.notes,
       },
     });
