@@ -60,6 +60,7 @@ model SourdoughLoaf {
   initialMixTime  String   @db.VarChar(50)  // e.g., "9:30 AM"
   temperature     Int?     // Outside temperature in °F at time of mix
   indoorTempMix   Int?     // Indoor temperature in °F at time of mix
+  imageUrl        String?  @db.VarChar(500) // Vercel Blob URL for loaf photo
   flourGrams      Int?
   flourType       String?  @db.VarChar(255)
   waterGrams      Int?

@@ -72,10 +72,12 @@ type BakeEvent = {
   date?: string; // Optional date in YYYY-MM-DD format for next-day bakes
 };
 
-type StretchFold = {
+type StretchFoldObject = {
   time: string;
   indoorTemp?: number;
 };
+
+type StretchFold = StretchFoldObject | string; // Support both old string format and new object format
 
 type SourdoughLoaf = {
   id: number;
@@ -83,6 +85,7 @@ type SourdoughLoaf = {
   initialMixTime: string;
   temperature: number | null;
   indoorTempMix: number | null;
+  imageUrl: string | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
@@ -285,9 +288,14 @@ function LoafCard({
     onUpdate({ stretchFolds: folds });
   };
 
-  const updateStretchFold = (index: number, updates: Partial<StretchFold>) => {
+  const updateStretchFold = (index: number, updates: Partial<StretchFoldObject>) => {
     const folds = [...(loaf.stretchFolds || [])];
-    folds[index] = { ...folds[index], ...updates };
+    const currentFold = folds[index];
+    // Convert old string format to object format if needed
+    const currentObj: StretchFoldObject = typeof currentFold === "string"
+      ? { time: currentFold }
+      : currentFold;
+    folds[index] = { ...currentObj, ...updates };
     onUpdate({ stretchFolds: folds });
   };
 
@@ -417,29 +425,34 @@ function LoafCard({
         </div>
         {loaf.stretchFolds && loaf.stretchFolds.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {loaf.stretchFolds.map((fold, index) => (
-              <span
-                key={index}
-                className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2"
-              >
-                <EditableTime
-                  time={fold.time}
-                  onUpdate={(newTime) => updateStretchFold(index, { time: newTime })}
-                />
-                <TempInput
-                  value={fold.indoorTemp || null}
-                  onUpdate={(temp) => updateStretchFold(index, { indoorTemp: temp || undefined })}
-                  placeholder="Temp"
-                  compact
-                />
-                <button
-                  onClick={() => removeStretchFold(index)}
-                  className="text-gray-400 hover:text-gray-600"
+            {loaf.stretchFolds.map((fold, index) => {
+              // Handle both old string format and new object format
+              const foldTime = typeof fold === "string" ? fold : fold.time;
+              const foldIndoorTemp = typeof fold === "string" ? null : (fold.indoorTemp || null);
+              return (
+                <span
+                  key={index}
+                  className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2"
                 >
-                  ×
-                </button>
-              </span>
-            ))}
+                  <EditableTime
+                    time={foldTime}
+                    onUpdate={(newTime) => updateStretchFold(index, { time: newTime })}
+                  />
+                  <TempInput
+                    value={foldIndoorTemp}
+                    onUpdate={(temp) => updateStretchFold(index, { indoorTemp: temp || undefined })}
+                    placeholder="Temp"
+                    compact
+                  />
+                  <button
+                    onClick={() => removeStretchFold(index)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              );
+            })}
           </div>
         ) : (
           <div className="text-gray-400 text-sm">None yet</div>
@@ -605,6 +618,13 @@ function LoafCard({
           />
         </div>
       </div>
+
+      {/* Photo */}
+      <ImageUpload
+        loafId={loaf.id}
+        imageUrl={loaf.imageUrl}
+        onUpdate={(url) => onUpdate({ imageUrl: url })}
+      />
 
       {/* Notes */}
       <NotesInput
@@ -938,6 +958,100 @@ function NotesInput({
         >
           Save Notes
         </button>
+      )}
+    </div>
+  );
+}
+
+function ImageUpload({
+  loafId,
+  imageUrl,
+  onUpdate,
+}: {
+  loafId: number;
+  imageUrl: string | null;
+  onUpdate: (url: string | null) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Show preview
+    setPreview(URL.createObjectURL(file));
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("loafId", loafId.toString());
+
+      const res = await fetch("/api/sourdough/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        onUpdate(data.url);
+        setPreview(null);
+      } else {
+        console.error("Upload failed");
+        setPreview(null);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setPreview(null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = () => {
+    onUpdate(null);
+  };
+
+  const displayUrl = preview || imageUrl;
+
+  return (
+    <div>
+      <div className="text-gray-700 text-sm font-medium mb-2">Photo</div>
+      {displayUrl ? (
+        <div className="relative inline-block">
+          <img
+            src={displayUrl}
+            alt="Loaf photo"
+            className="w-48 h-48 object-cover rounded-lg border border-gray-200"
+          />
+          {uploading && (
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg">
+              <div className="w-6 h-6 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin" />
+            </div>
+          )}
+          {!uploading && (
+            <button
+              onClick={handleRemove}
+              className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm shadow-md"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      ) : (
+        <label className="cursor-pointer inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-lg transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Add Photo
+          <input
+            type="file"
+            accept="image/webp,image/png,image/jpeg,image/jpg"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+        </label>
       )}
     </div>
   );

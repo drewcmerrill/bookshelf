@@ -61,7 +61,7 @@ type BakeEvent = {
 type StretchFold = {
   time: string;
   indoorTemp?: number;
-};
+} | string; // Support both old string format and new object format
 
 type SourdoughLoaf = {
   id: number;
@@ -69,6 +69,7 @@ type SourdoughLoaf = {
   initialMixTime: string;
   temperature: number | null;
   indoorTempMix: number | null;
+  imageUrl: string | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
@@ -203,18 +204,22 @@ export default function SourdoughPage() {
                       <span className="text-slate-500 text-sm">Stretch & Folds</span>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                         {loaf.stretchFolds.map((fold, idx) => {
-                          const prevTime = idx === 0 ? loaf.initialMixTime : loaf.stretchFolds![idx - 1].time;
-                          const duration = getMinutesBetween(prevTime, fold.time);
+                          // Handle both old string format and new object format
+                          const foldTime = typeof fold === "string" ? fold : fold.time;
+                          const foldIndoorTemp = typeof fold === "string" ? undefined : fold.indoorTemp;
+                          const prevFold = loaf.stretchFolds![idx - 1];
+                          const prevTime = idx === 0 ? loaf.initialMixTime : (typeof prevFold === "string" ? prevFold : prevFold.time);
+                          const duration = getMinutesBetween(prevTime, foldTime);
                           return (
                             <div key={idx} className="flex items-center gap-2">
                               {idx > 0 && (
                                 <span className="text-slate-400 text-xs">+{formatDuration(duration)}</span>
                               )}
                               <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
-                                {formatTime(fold.time)}
-                                {fold.indoorTemp && (
+                                {formatTime(foldTime)}
+                                {foldIndoorTemp && (
                                   <span className="text-slate-400 text-xs ml-1">
-                                    ({fold.indoorTemp}°F)
+                                    ({foldIndoorTemp}°F)
                                   </span>
                                 )}
                                 {idx === 0 && (
@@ -402,6 +407,20 @@ export default function SourdoughPage() {
                     <div>
                       <span className="text-slate-500 text-sm">Notes</span>
                       <p className="text-slate-700 text-sm mt-1">{loaf.notes}</p>
+                    </div>
+                  )}
+
+                  {/* Photo */}
+                  {loaf.imageUrl && (
+                    <div>
+                      <span className="text-slate-500 text-sm">Photo</span>
+                      <div className="mt-1">
+                        <img
+                          src={loaf.imageUrl}
+                          alt={`Loaf ${loafNumber}`}
+                          className="w-full max-w-sm rounded-lg border border-slate-200"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
