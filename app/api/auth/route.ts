@@ -1,5 +1,15 @@
-import { createSessionToken, verifyPassword } from "@/lib/auth";
+import { createSessionToken, verifyPassword, verifySession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const sessionToken = request.cookies.get("admin_session")?.value;
+
+  if (!sessionToken || !(await verifySession(sessionToken))) {
+    return NextResponse.json({ authenticated: false });
+  }
+
+  return NextResponse.json({ authenticated: true });
+}
 
 export async function POST(request: NextRequest) {
   try {

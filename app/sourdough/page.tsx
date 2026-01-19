@@ -19,6 +19,17 @@ export default function SourdoughPage() {
   const [loaves, setLoaves] = useState<SourdoughLoaf[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch("/api/auth");
+      const data = await res.json();
+      setIsAdmin(data.authenticated);
+    } catch {
+      setIsAdmin(false);
+    }
+  };
 
   const fetchLoaves = async () => {
     try {
@@ -33,6 +44,7 @@ export default function SourdoughPage() {
   };
 
   useEffect(() => {
+    checkAuth();
     fetchLoaves();
   }, []);
 
@@ -125,17 +137,19 @@ export default function SourdoughPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full">
-        {/* Start New Loaf Button */}
-        <button
-          onClick={startNewLoaf}
-          disabled={saving}
-          className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-medium py-3 rounded-lg mb-6 transition-colors flex items-center justify-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Start New Loaf
-        </button>
+        {/* Start New Loaf Button - Admin only */}
+        {isAdmin && (
+          <button
+            onClick={startNewLoaf}
+            disabled={saving}
+            className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-medium py-3 rounded-lg mb-6 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Start New Loaf
+          </button>
+        )}
 
         {/* Loaves */}
         {loading ? (
@@ -152,6 +166,7 @@ export default function SourdoughPage() {
               <LoafCard
                 key={loaf.id}
                 loaf={loaf}
+                isAdmin={isAdmin}
                 onUpdate={(updates) => updateLoaf(loaf.id, updates)}
                 onAddFold={() => addStretchFold(loaf)}
                 onRemoveFold={(index) => removeStretchFold(loaf, index)}
@@ -168,6 +183,7 @@ export default function SourdoughPage() {
 
 function LoafCard({
   loaf,
+  isAdmin,
   onUpdate,
   onAddFold,
   onRemoveFold,
@@ -175,6 +191,7 @@ function LoafCard({
   calculateHydration,
 }: {
   loaf: SourdoughLoaf;
+  isAdmin: boolean;
   onUpdate: (updates: Partial<SourdoughLoaf>) => void;
   onAddFold: () => void;
   onRemoveFold: (index: number) => void;
@@ -199,40 +216,59 @@ function LoafCard({
             Started at {loaf.initialMixTime}
           </div>
         </div>
-        <button
-          onClick={onDelete}
-          className="text-slate-300 hover:text-red-500 transition-colors p-1"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
+        {isAdmin && (
+          <button
+            onClick={onDelete}
+            className="text-slate-300 hover:text-red-500 transition-colors p-1"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Ingredient Rows */}
-      <div className="space-y-2">
-        <IngredientRow
-          label="Flour"
-          value={loaf.flourGrams}
-          unit="g"
-          secondaryValue={loaf.flourType}
-          secondaryPlaceholder="Type"
-          onValueChange={(v) => onUpdate({ flourGrams: v })}
-          onSecondaryChange={(v) => onUpdate({ flourType: v })}
-        />
-        <IngredientRow
-          label="Water"
-          value={loaf.waterGrams}
-          unit="g"
-          onValueChange={(v) => onUpdate({ waterGrams: v })}
-        />
-        <IngredientRow
-          label="Starter"
-          value={loaf.starterGrams}
-          unit="g"
-          onValueChange={(v) => onUpdate({ starterGrams: v })}
-        />
-      </div>
+      {isAdmin ? (
+        <div className="space-y-2">
+          <IngredientRow
+            label="Flour"
+            value={loaf.flourGrams}
+            unit="g"
+            secondaryValue={loaf.flourType}
+            secondaryPlaceholder="Type"
+            onValueChange={(v) => onUpdate({ flourGrams: v })}
+            onSecondaryChange={(v) => onUpdate({ flourType: v })}
+          />
+          <IngredientRow
+            label="Water"
+            value={loaf.waterGrams}
+            unit="g"
+            onValueChange={(v) => onUpdate({ waterGrams: v })}
+          />
+          <IngredientRow
+            label="Starter"
+            value={loaf.starterGrams}
+            unit="g"
+            onValueChange={(v) => onUpdate({ starterGrams: v })}
+          />
+        </div>
+      ) : (
+        <div className="space-y-1 text-sm">
+          <div className="flex gap-4">
+            <span className="text-slate-500">Flour:</span>
+            <span className="text-slate-900">{loaf.flourGrams || 0}g {loaf.flourType || ""}</span>
+          </div>
+          <div className="flex gap-4">
+            <span className="text-slate-500">Water:</span>
+            <span className="text-slate-900">{loaf.waterGrams || 0}g</span>
+          </div>
+          <div className="flex gap-4">
+            <span className="text-slate-500">Starter:</span>
+            <span className="text-slate-900">{loaf.starterGrams || 0}g</span>
+          </div>
+        </div>
+      )}
 
       {/* Hydration */}
       {hydration !== null && hydration > 0 && (
@@ -245,15 +281,17 @@ function LoafCard({
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-slate-600 text-sm">Stretch & Folds</span>
-          <button
-            onClick={onAddFold}
-            className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded-md transition-colors flex items-center gap-1"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add
-          </button>
+          {isAdmin && (
+            <button
+              onClick={onAddFold}
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded-md transition-colors flex items-center gap-1"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add
+            </button>
+          )}
         </div>
         {loaf.stretchFolds && loaf.stretchFolds.length > 0 ? (
           <div className="flex flex-wrap gap-2">
@@ -263,32 +301,41 @@ function LoafCard({
                 className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm flex items-center gap-2"
               >
                 {time}
-                <button
-                  onClick={() => onRemoveFold(index)}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  ×
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => onRemoveFold(index)}
+                    className="text-slate-400 hover:text-slate-600"
+                  >
+                    ×
+                  </button>
+                )}
               </span>
             ))}
           </div>
         ) : (
-          <div className="text-slate-400 text-sm">None yet</div>
+          <div className="text-slate-400 text-sm">None</div>
         )}
       </div>
 
       {/* Notes */}
-      <div>
-        <label className="text-slate-600 text-sm block mb-1">Notes</label>
-        <textarea
-          value={loaf.notes || ""}
-          onChange={(e) => onUpdate({ notes: e.target.value || null })}
-          onBlur={(e) => onUpdate({ notes: e.target.value || null })}
-          rows={2}
-          className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 text-sm placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-transparent"
-          placeholder="How did it turn out?"
-        />
-      </div>
+      {isAdmin ? (
+        <div>
+          <label className="text-slate-600 text-sm block mb-1">Notes</label>
+          <textarea
+            value={loaf.notes || ""}
+            onChange={(e) => onUpdate({ notes: e.target.value || null })}
+            onBlur={(e) => onUpdate({ notes: e.target.value || null })}
+            rows={2}
+            className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 text-sm placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-transparent"
+            placeholder="How did it turn out?"
+          />
+        </div>
+      ) : loaf.notes ? (
+        <div>
+          <span className="text-slate-500 text-sm">Notes:</span>
+          <p className="text-slate-700 text-sm mt-1">{loaf.notes}</p>
+        </div>
+      ) : null}
     </div>
   );
 }
