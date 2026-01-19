@@ -72,20 +72,28 @@ type BakeEvent = {
   date?: string; // Optional date in YYYY-MM-DD format for next-day bakes
 };
 
+type StretchFold = {
+  time: string;
+  indoorTemp?: number;
+};
+
 type SourdoughLoaf = {
   id: number;
   date: string;
   initialMixTime: string;
   temperature: number | null;
+  indoorTempMix: number | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
   starterGrams: number | null;
-  stretchFolds: string[] | null;
+  stretchFolds: StretchFold[] | null;
   firstProofTime: string | null;
   firstProofLocation: string | null;
+  firstProofIndoorTemp: number | null;
   secondProofTime: string | null;
   secondProofLocation: string | null;
+  secondProofIndoorTemp: number | null;
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
@@ -273,7 +281,13 @@ function LoafCard({
   const addStretchFold = () => {
     const now = new Date();
     const time = now.toTimeString().slice(0, 5);
-    const folds = [...(loaf.stretchFolds || []), time];
+    const folds = [...(loaf.stretchFolds || []), { time }];
+    onUpdate({ stretchFolds: folds });
+  };
+
+  const updateStretchFold = (index: number, updates: Partial<StretchFold>) => {
+    const folds = [...(loaf.stretchFolds || [])];
+    folds[index] = { ...folds[index], ...updates };
     onUpdate({ stretchFolds: folds });
   };
 
@@ -329,7 +343,7 @@ function LoafCard({
               day: "numeric",
             })}
           </div>
-          <div className="text-gray-500 text-sm flex items-center gap-1">
+          <div className="text-gray-500 text-sm flex items-center gap-1 flex-wrap">
             Mixed at{" "}
             <EditableTime
               time={loaf.initialMixTime}
@@ -338,6 +352,12 @@ function LoafCard({
             {loaf.temperature && (
               <span className="ml-2">• {loaf.temperature}°F outside</span>
             )}
+            <span className="ml-2">•</span>
+            <TempInput
+              value={loaf.indoorTempMix}
+              onUpdate={(temp) => onUpdate({ indoorTempMix: temp })}
+              placeholder="Indoor"
+            />
           </div>
         </div>
         <button
@@ -397,18 +417,20 @@ function LoafCard({
         </div>
         {loaf.stretchFolds && loaf.stretchFolds.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {loaf.stretchFolds.map((time, index) => (
+            {loaf.stretchFolds.map((fold, index) => (
               <span
                 key={index}
                 className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2"
               >
                 <EditableTime
-                  time={time}
-                  onUpdate={(newTime) => {
-                    const folds = [...(loaf.stretchFolds || [])];
-                    folds[index] = newTime;
-                    onUpdate({ stretchFolds: folds });
-                  }}
+                  time={fold.time}
+                  onUpdate={(newTime) => updateStretchFold(index, { time: newTime })}
+                />
+                <TempInput
+                  value={fold.indoorTemp || null}
+                  onUpdate={(temp) => updateStretchFold(index, { indoorTemp: temp || undefined })}
+                  placeholder="Temp"
+                  compact
                 />
                 <button
                   onClick={() => removeStretchFold(index)}
@@ -431,31 +453,38 @@ function LoafCard({
           <div className="flex items-center gap-3">
             <span className="text-gray-600 text-sm w-24">First Proof</span>
             {loaf.firstProofTime ? (
-              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                <EditableTime
-                  time={loaf.firstProofTime}
-                  onUpdate={(time) => onUpdate({ firstProofTime: time })}
-                />
-                {loaf.firstProofLocation && (
-                  <select
-                    value={loaf.firstProofLocation}
-                    onChange={(e) => onUpdate({ firstProofLocation: e.target.value })}
-                    className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
+              <>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                  <EditableTime
+                    time={loaf.firstProofTime}
+                    onUpdate={(time) => onUpdate({ firstProofTime: time })}
+                  />
+                  {loaf.firstProofLocation && (
+                    <select
+                      value={loaf.firstProofLocation}
+                      onChange={(e) => onUpdate({ firstProofLocation: e.target.value })}
+                      className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
+                    >
+                      {PROOF_LOCATIONS.map((loc) => (
+                        <option key={loc.value} value={loc.value}>
+                          ({loc.label})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <button
+                    onClick={() => clearProof("firstProofTime", "firstProofLocation")}
+                    className="text-gray-400 hover:text-gray-600"
                   >
-                    {PROOF_LOCATIONS.map((loc) => (
-                      <option key={loc.value} value={loc.value}>
-                        ({loc.label})
-                      </option>
-                    ))}
-                  </select>
-                )}
-                <button
-                  onClick={() => clearProof("firstProofTime", "firstProofLocation")}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </span>
+                    ×
+                  </button>
+                </span>
+                <TempInput
+                  value={loaf.firstProofIndoorTemp}
+                  onUpdate={(temp) => onUpdate({ firstProofIndoorTemp: temp })}
+                  placeholder="Indoor"
+                />
+              </>
             ) : (
               <div className="flex gap-2">
                 {PROOF_LOCATIONS.map((loc) => (
@@ -473,31 +502,38 @@ function LoafCard({
           <div className="flex items-center gap-3">
             <span className="text-gray-600 text-sm w-24">Second Proof</span>
             {loaf.secondProofTime ? (
-              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                <EditableTime
-                  time={loaf.secondProofTime}
-                  onUpdate={(time) => onUpdate({ secondProofTime: time })}
-                />
-                {loaf.secondProofLocation && (
-                  <select
-                    value={loaf.secondProofLocation}
-                    onChange={(e) => onUpdate({ secondProofLocation: e.target.value })}
-                    className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
+              <>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                  <EditableTime
+                    time={loaf.secondProofTime}
+                    onUpdate={(time) => onUpdate({ secondProofTime: time })}
+                  />
+                  {loaf.secondProofLocation && (
+                    <select
+                      value={loaf.secondProofLocation}
+                      onChange={(e) => onUpdate({ secondProofLocation: e.target.value })}
+                      className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
+                    >
+                      {PROOF_LOCATIONS.map((loc) => (
+                        <option key={loc.value} value={loc.value}>
+                          ({loc.label})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <button
+                    onClick={() => clearProof("secondProofTime", "secondProofLocation")}
+                    className="text-gray-400 hover:text-gray-600"
                   >
-                    {PROOF_LOCATIONS.map((loc) => (
-                      <option key={loc.value} value={loc.value}>
-                        ({loc.label})
-                      </option>
-                    ))}
-                  </select>
-                )}
-                <button
-                  onClick={() => clearProof("secondProofTime", "secondProofLocation")}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </span>
+                    ×
+                  </button>
+                </span>
+                <TempInput
+                  value={loaf.secondProofIndoorTemp}
+                  onUpdate={(temp) => onUpdate({ secondProofIndoorTemp: temp })}
+                  placeholder="Indoor"
+                />
+              </>
             ) : (
               <div className="flex gap-2">
                 {PROOF_LOCATIONS.map((loc) => (
@@ -812,6 +848,51 @@ function CrossSectionInput({
       />
       <span className="text-gray-400 text-sm">in</span>
     </div>
+  );
+}
+
+function TempInput({
+  value,
+  onUpdate,
+  placeholder = "Temp",
+  compact = false,
+}: {
+  value: number | null;
+  onUpdate: (temp: number | null) => void;
+  placeholder?: string;
+  compact?: boolean;
+}) {
+  const [localValue, setLocalValue] = useState(value?.toString() || "");
+
+  useEffect(() => {
+    setLocalValue(value?.toString() || "");
+  }, [value]);
+
+  if (compact) {
+    return (
+      <input
+        type="number"
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        onBlur={() => onUpdate(localValue ? parseInt(localValue) : null)}
+        className="w-12 bg-white border border-gray-200 rounded px-1 py-0.5 text-gray-700 text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+        placeholder="°F"
+      />
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <input
+        type="number"
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        onBlur={() => onUpdate(localValue ? parseInt(localValue) : null)}
+        className="w-14 bg-gray-50 border border-gray-200 rounded px-2 py-0.5 text-gray-700 text-sm text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+        placeholder={placeholder}
+      />
+      <span className="text-gray-400 text-sm">°F</span>
+    </span>
   );
 }
 

@@ -59,15 +59,18 @@ model SourdoughLoaf {
   date            DateTime @default(now())
   initialMixTime  String   @db.VarChar(50)  // e.g., "9:30 AM"
   temperature     Int?     // Outside temperature in °F at time of mix
+  indoorTempMix   Int?     // Indoor temperature in °F at time of mix
   flourGrams      Int?
   flourType       String?  @db.VarChar(255)
   waterGrams      Int?
   starterGrams    Int?
-  stretchFolds    Json?    // Array of times, e.g., ["10:00", "10:30", "11:00"]
+  stretchFolds    Json?    // Array of {time, indoorTemp?}, e.g., [{"time": "10:00", "indoorTemp": 72}]
   firstProofTime     String?  @db.VarChar(50)  // Time first proof started
   firstProofLocation String?  @db.VarChar(50)  // "oven", "counter", or "fridge"
+  firstProofIndoorTemp Int?   // Indoor temperature when first proof started
   secondProofTime    String?  @db.VarChar(50)  // Time second proof started
   secondProofLocation String? @db.VarChar(50)  // "oven", "counter", or "fridge"
+  secondProofIndoorTemp Int?  // Indoor temperature when second proof started
   bakeEvents      Json?    // Array of {time, temp, date?}, e.g., [{"time": "14:00", "temp": 450, "date": "2024-01-15"}]
   bakeEndTime     String?  @db.VarChar(50)  // Time loaf was removed from oven
   bakeEndDate     String?  @db.VarChar(50)  // Date loaf was removed (if different from loaf date)

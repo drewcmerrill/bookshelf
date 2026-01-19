@@ -58,20 +58,28 @@ type BakeEvent = {
   date?: string; // Optional date for next-day bakes
 };
 
+type StretchFold = {
+  time: string;
+  indoorTemp?: number;
+};
+
 type SourdoughLoaf = {
   id: number;
   date: string;
   initialMixTime: string;
   temperature: number | null;
+  indoorTempMix: number | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
   starterGrams: number | null;
-  stretchFolds: string[] | null;
+  stretchFolds: StretchFold[] | null;
   firstProofTime: string | null;
   firstProofLocation: string | null;
+  firstProofIndoorTemp: number | null;
   secondProofTime: string | null;
   secondProofLocation: string | null;
+  secondProofIndoorTemp: number | null;
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
@@ -160,6 +168,9 @@ export default function SourdoughPage() {
                       {loaf.temperature && (
                         <span className="ml-2">• {loaf.temperature}°F outside</span>
                       )}
+                      {loaf.indoorTempMix && (
+                        <span className="ml-2">• {loaf.indoorTempMix}°F inside</span>
+                      )}
                     </div>
                   </div>
 
@@ -191,16 +202,21 @@ export default function SourdoughPage() {
                     <div>
                       <span className="text-slate-500 text-sm">Stretch & Folds</span>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
-                        {loaf.stretchFolds.map((time, idx) => {
-                          const prevTime = idx === 0 ? loaf.initialMixTime : loaf.stretchFolds![idx - 1];
-                          const duration = getMinutesBetween(prevTime, time);
+                        {loaf.stretchFolds.map((fold, idx) => {
+                          const prevTime = idx === 0 ? loaf.initialMixTime : loaf.stretchFolds![idx - 1].time;
+                          const duration = getMinutesBetween(prevTime, fold.time);
                           return (
                             <div key={idx} className="flex items-center gap-2">
                               {idx > 0 && (
                                 <span className="text-slate-400 text-xs">+{formatDuration(duration)}</span>
                               )}
                               <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
-                                {formatTime(time)}
+                                {formatTime(fold.time)}
+                                {fold.indoorTemp && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    ({fold.indoorTemp}°F)
+                                  </span>
+                                )}
                                 {idx === 0 && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     (+{formatDuration(duration)} from mix)
@@ -248,6 +264,11 @@ export default function SourdoughPage() {
                                 {loaf.firstProofLocation && (
                                   <span className="text-slate-500 ml-1">({loaf.firstProofLocation})</span>
                                 )}
+                                {loaf.firstProofIndoorTemp && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    {loaf.firstProofIndoorTemp}°F
+                                  </span>
+                                )}
                                 {firstProofDuration && firstProofDuration > 0 && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     — {formatDuration(firstProofDuration)}
@@ -263,6 +284,11 @@ export default function SourdoughPage() {
                                 {formatTime(loaf.secondProofTime)}
                                 {loaf.secondProofLocation && (
                                   <span className="text-slate-500 ml-1">({loaf.secondProofLocation})</span>
+                                )}
+                                {loaf.secondProofIndoorTemp && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    {loaf.secondProofIndoorTemp}°F
+                                  </span>
                                 )}
                                 {secondProofDuration && secondProofDuration > 0 && (
                                   <span className="text-slate-400 text-xs ml-1">
