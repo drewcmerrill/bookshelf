@@ -35,17 +35,24 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // If updating imageUrl, delete the old image from blob storage
-    if (body.imageUrl !== undefined) {
+    // If updating imageUrls, delete any removed images from blob storage
+    if (body.imageUrls !== undefined) {
       const existingLoaf = await prisma.sourdoughLoaf.findUnique({
         where: { id: parseInt(id) },
-        select: { imageUrl: true },
+        select: { imageUrls: true },
       });
-      if (existingLoaf?.imageUrl && existingLoaf.imageUrl.includes("blob.vercel-storage.com")) {
-        try {
-          await del(existingLoaf.imageUrl);
-        } catch (blobError) {
-          console.error("Error deleting old blob image:", blobError);
+      const oldUrls = (existingLoaf?.imageUrls as string[] | null) || [];
+      const newUrls = (body.imageUrls as string[]) || [];
+
+      // Find URLs that were removed
+      const removedUrls = oldUrls.filter(url => !newUrls.includes(url));
+      for (const url of removedUrls) {
+        if (url.includes("blob.vercel-storage.com")) {
+          try {
+            await del(url);
+          } catch (blobError) {
+            console.error("Error deleting blob image:", blobError);
+          }
         }
       }
     }
@@ -57,7 +64,7 @@ export async function PUT(
         initialMixTime: body.initialMixTime,
         temperature: body.temperature,
         indoorTempMix: body.indoorTempMix,
-        imageUrl: body.imageUrl,
+        imageUrls: body.imageUrls,
         flourGrams: body.flourGrams,
         flourType: body.flourType,
         waterGrams: body.waterGrams,
@@ -97,18 +104,21 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // Get the loaf to check for image
+    // Get the loaf to check for images
     const loaf = await prisma.sourdoughLoaf.findUnique({
       where: { id: parseInt(id) },
-      select: { imageUrl: true },
+      select: { imageUrls: true },
     });
 
-    // Delete image from blob storage if exists
-    if (loaf?.imageUrl && loaf.imageUrl.includes("blob.vercel-storage.com")) {
-      try {
-        await del(loaf.imageUrl);
-      } catch (blobError) {
-        console.error("Error deleting blob image:", blobError);
+    // Delete all images from blob storage
+    const imageUrls = (loaf?.imageUrls as string[] | null) || [];
+    for (const url of imageUrls) {
+      if (url.includes("blob.vercel-storage.com")) {
+        try {
+          await del(url);
+        } catch (blobError) {
+          console.error("Error deleting blob image:", blobError);
+        }
       }
     }
 

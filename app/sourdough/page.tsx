@@ -69,7 +69,7 @@ type SourdoughLoaf = {
   initialMixTime: string;
   temperature: number | null;
   indoorTempMix: number | null;
-  imageUrl: string | null;
+  imageUrls: string[] | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
@@ -410,16 +410,19 @@ export default function SourdoughPage() {
                     </div>
                   )}
 
-                  {/* Photo */}
-                  {loaf.imageUrl && (
+                  {/* Photos */}
+                  {loaf.imageUrls && loaf.imageUrls.length > 0 && (
                     <div>
-                      <span className="text-slate-500 text-sm">Photo</span>
-                      <div className="mt-1">
-                        <img
-                          src={loaf.imageUrl}
-                          alt={`Loaf ${loafNumber}`}
-                          className="w-full max-w-sm rounded-lg border border-slate-200"
-                        />
+                      <span className="text-slate-500 text-sm">Photos</span>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {loaf.imageUrls.map((url, idx) => (
+                          <img
+                            key={url}
+                            src={url}
+                            alt={`Loaf ${loafNumber} photo ${idx + 1}`}
+                            className="w-full max-w-xs rounded-lg border border-slate-200"
+                          />
+                        ))}
                       </div>
                     </div>
                   )}

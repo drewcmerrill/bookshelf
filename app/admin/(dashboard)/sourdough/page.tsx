@@ -85,7 +85,7 @@ type SourdoughLoaf = {
   initialMixTime: string;
   temperature: number | null;
   indoorTempMix: number | null;
-  imageUrl: string | null;
+  imageUrls: string[] | null;
   flourGrams: number | null;
   flourType: string | null;
   waterGrams: number | null;
@@ -619,11 +619,11 @@ function LoafCard({
         </div>
       </div>
 
-      {/* Photo */}
+      {/* Photos */}
       <ImageUpload
         loafId={loaf.id}
-        imageUrl={loaf.imageUrl}
-        onUpdate={(url) => onUpdate({ imageUrl: url })}
+        imageUrls={loaf.imageUrls || []}
+        onUpdate={(urls) => onUpdate({ imageUrls: urls })}
       />
 
       {/* Notes */}
@@ -965,22 +965,19 @@ function NotesInput({
 
 function ImageUpload({
   loafId,
-  imageUrl,
+  imageUrls,
   onUpdate,
 }: {
   loafId: number;
-  imageUrl: string | null;
-  onUpdate: (url: string | null) => void;
+  imageUrls: string[];
+  onUpdate: (urls: string[]) => void;
 }) {
   const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Show preview
-    setPreview(URL.createObjectURL(file));
     setUploading(true);
 
     try {
@@ -995,64 +992,63 @@ function ImageUpload({
 
       if (res.ok) {
         const data = await res.json();
-        onUpdate(data.url);
-        setPreview(null);
+        onUpdate([...imageUrls, data.url]);
       } else {
         console.error("Upload failed");
-        setPreview(null);
       }
     } catch (error) {
       console.error("Upload error:", error);
-      setPreview(null);
     } finally {
       setUploading(false);
+      // Reset the input so the same file can be selected again
+      e.target.value = "";
     }
   };
 
-  const handleRemove = () => {
-    onUpdate(null);
+  const handleRemove = (index: number) => {
+    const newUrls = imageUrls.filter((_, i) => i !== index);
+    onUpdate(newUrls);
   };
-
-  const displayUrl = preview || imageUrl;
 
   return (
     <div>
-      <div className="text-gray-700 text-sm font-medium mb-2">Photo</div>
-      {displayUrl ? (
-        <div className="relative inline-block">
-          <img
-            src={displayUrl}
-            alt="Loaf photo"
-            className="w-48 h-48 object-cover rounded-lg border border-gray-200"
-          />
-          {uploading && (
-            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg">
-              <div className="w-6 h-6 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin" />
-            </div>
-          )}
-          {!uploading && (
+      <div className="text-gray-700 text-sm font-medium mb-2">Photos</div>
+      <div className="flex flex-wrap gap-3">
+        {imageUrls.map((url, index) => (
+          <div key={url} className="relative">
+            <img
+              src={url}
+              alt={`Loaf photo ${index + 1}`}
+              className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+            />
             <button
-              onClick={handleRemove}
+              onClick={() => handleRemove(index)}
               className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm shadow-md"
             >
               ×
             </button>
+          </div>
+        ))}
+        <label className="cursor-pointer w-32 h-32 flex flex-col items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg border-2 border-dashed border-gray-300 transition-colors">
+          {uploading ? (
+            <div className="w-6 h-6 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin" />
+          ) : (
+            <>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="text-xs">Add Photo</span>
+            </>
           )}
-        </div>
-      ) : (
-        <label className="cursor-pointer inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-lg transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          Add Photo
           <input
             type="file"
             accept="image/webp,image/png,image/jpeg,image/jpg"
             onChange={handleFileSelect}
             className="hidden"
+            disabled={uploading}
           />
         </label>
-      )}
+      </div>
     </div>
   );
 }
