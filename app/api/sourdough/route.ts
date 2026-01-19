@@ -22,15 +22,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (
-      !body.initialMixTime ||
-      !body.flourGrams ||
-      !body.flourType ||
-      !body.waterGrams ||
-      !body.starterGrams
-    ) {
+    if (!body.initialMixTime) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Initial mix time is required" },
         { status: 400 }
       );
     }
@@ -39,10 +33,10 @@ export async function POST(request: NextRequest) {
       data: {
         date: body.date ? new Date(body.date) : new Date(),
         initialMixTime: body.initialMixTime,
-        flourGrams: body.flourGrams,
-        flourType: body.flourType,
-        waterGrams: body.waterGrams,
-        starterGrams: body.starterGrams,
+        flourGrams: body.flourGrams || null,
+        flourType: body.flourType || null,
+        waterGrams: body.waterGrams || null,
+        starterGrams: body.starterGrams || null,
         stretchFolds: body.stretchFolds || [],
         notes: body.notes || null,
       },

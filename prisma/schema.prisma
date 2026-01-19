@@ -58,11 +58,11 @@ model SourdoughLoaf {
   id              Int      @id @default(autoincrement())
   date            DateTime @default(now())
   initialMixTime  String   @db.VarChar(50)  // e.g., "9:30 AM"
-  flourGrams      Int
-  flourType       String   @db.VarChar(255)
-  waterGrams      Int
-  starterGrams    Int
-  stretchFolds    Json     // Array of times, e.g., ["10:00 AM", "10:30 AM", "11:00 AM"]
+  flourGrams      Int?
+  flourType       String?  @db.VarChar(255)
+  waterGrams      Int?
+  starterGrams    Int?
+  stretchFolds    Json?    // Array of times, e.g., ["10:00 AM", "10:30 AM", "11:00 AM"]
   notes           String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
