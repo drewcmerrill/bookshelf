@@ -6,10 +6,9 @@ export default function Home() {
       <div className="max-w-xl w-full">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">
+          {/* <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">
             Drew Merrill
-          </h1>
-          <p className="text-slate-400 text-lg">Projects & Things</p>
+          </h1> */}
         </div>
 
         {/* Links */}
