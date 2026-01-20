@@ -47,7 +47,7 @@ export default async function AdminDashboard() {
             Dashboard
           </h1>
           <p className="text-gray-500 mt-1 text-sm sm:text-base">
-            Welcome back! Here's an overview of your bookshelf.
+            Bookshelf stats
           </p>
         </div>
         <Link
