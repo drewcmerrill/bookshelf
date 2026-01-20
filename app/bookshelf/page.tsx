@@ -3,11 +3,11 @@ import { Stats } from "@/components/Stats";
 import { prisma } from "@/lib/prisma";
 import { Book } from "@/data/types";
 import Link from "next/link";
-import { Tangerine } from "next/font/google";
+import { IM_Fell_Great_Primer_SC } from "next/font/google";
 
-const tangerine = Tangerine({
+const FellGreatPrimer = IM_Fell_Great_Primer_SC({
+  weight: "400",
   subsets: ["latin"],
-  weight: "700",
 });
 
 export const dynamic = "force-dynamic";
@@ -46,10 +46,10 @@ export default async function BookshelfPage() {
       className="min-h-screen bg-slate-50 flex flex-col bg-cover bg-center bg-no-repeat gap-0  "
       style={{ backgroundImage: "url('/paper-texture.jpg')" }}
     >
-      <header className="relative bg-white border-b border-slate-200 px-4 py-8 flex items-center mb-5">
+      <header className="relative bg-white border-b border-slate-200 px-8 py-8 flex items-center mb-5">
         <Link
           href="/"
-          className="text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2"
+          className={`${FellGreatPrimer.className} text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2`}
         >
           <svg
             className="w-5 h-5"
@@ -68,14 +68,14 @@ export default async function BookshelfPage() {
         </Link>
 
         <h1
-          className={`${tangerine.className} text-5xl text-slate-900 absolute left-1/2 -translate-x-1/2`}
+          className={`${FellGreatPrimer.className} text-3xl md:text-5xl text-slate-900 absolute left-1/2 -translate-x-1/2`}
         >
           My Bookshelf
         </h1>
 
         <Link
           href="/admin"
-          className="ml-auto text-slate-400 hover:text-slate-600 transition-colors text-sm"
+          className={`${FellGreatPrimer.className} ml-auto text-slate-400 hover:text-slate-600 transition-colors `}
         >
           Edit
         </Link>

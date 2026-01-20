@@ -1,5 +1,11 @@
 "use client";
 import { Book } from "@/data/types";
+import { IM_Fell_Great_Primer_SC } from "next/font/google";
+
+const FellGreatPrimer = IM_Fell_Great_Primer_SC({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 type StatsProps = {
   books: Book[];
@@ -33,15 +39,7 @@ export function Stats({ books }: StatsProps) {
   return (
     <div className="w-full flex justify-center mb-6">
       <div
-        className="max-w-4xl w-full mx-4 overflow-hidden bg-white border border-slate-200 rounded-lg p-4 space-y-4 shadow-sm"
-        style={{
-          // background: "linear-gradient(135deg, #fef9ed 0%, #f5ebe0 100%)",
-          fontFamily: "'Georgia', serif",
-          // border: "2px solid #A07A55",
-          // boxShadow:
-          // "0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5)",
-          // borderRadius: "2px",
-        }}
+        className={` ${FellGreatPrimer.className} max-w-4xl w-full mx-4 overflow-hidden bg-white border border-slate-200 rounded-lg p-4 space-y-4 shadow-sm`}
       >
         {/* Header */}
         {/* <div className="relative px-6 pt-6 pb-4">
