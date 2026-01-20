@@ -46,7 +46,7 @@ export default async function BookshelfPage() {
       className="min-h-screen bg-slate-50 flex flex-col bg-cover bg-center bg-no-repeat gap-0  "
       style={{ backgroundImage: "url('/paper-texture.jpg')" }}
     >
-      <header className="bg-white border-b border-slate-200 px-4 py-4 flex justify-between items-center mb-5">
+      <header className="relative bg-white border-b border-slate-200 px-4 py-8 flex items-center mb-5">
         <Link
           href="/"
           className="text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2"
@@ -66,21 +66,21 @@ export default async function BookshelfPage() {
           </svg>
           Back
         </Link>
-        <div className="flex items-center gap-3">
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
-          <h1 className={`${tangerine.className} text-5xl text-slate-900`}>
-            My Bookshelf
-          </h1>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
-        </div>
+
+        <h1
+          className={`${tangerine.className} text-5xl text-slate-900 absolute left-1/2 -translate-x-1/2`}
+        >
+          My Bookshelf
+        </h1>
 
         <Link
           href="/admin"
-          className="text-slate-400 hover:text-slate-600 transition-colors text-sm"
+          className="ml-auto text-slate-400 hover:text-slate-600 transition-colors text-sm"
         >
           Edit
         </Link>
       </header>
+
       <Stats books={books}></Stats>
       <Shelf books={books}></Shelf>
     </div>

@@ -133,7 +133,7 @@ export default function SourdoughPage() {
       style={{ backgroundImage: "url('/paper-texture.jpg')" }}
     >
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-4 flex justify-between items-center">
+      <header className="bg-white border-b border-slate-200 px-4 py-8 flex justify-between items-center">
         <Link
           href="/"
           className="text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2"
@@ -153,13 +153,11 @@ export default function SourdoughPage() {
           </svg>
           Back
         </Link>
-        <div className="flex items-center gap-3">
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
-          <h1 className={`${tangerine.className} text-5xl text-slate-900`}>
-            Sourdough Log
-          </h1>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
-        </div>
+        <h1
+          className={`${tangerine.className} text-5xl text-slate-900 absolute left-1/2 -translate-x-1/2`}
+        >
+          Sourdough Log
+        </h1>
         <Link
           href="/admin/sourdough"
           className="text-slate-400 hover:text-slate-600 transition-colors text-sm"
