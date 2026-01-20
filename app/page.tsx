@@ -32,8 +32,7 @@ export default function Home() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="flex items-center justify-between gap-2 group mx-7 md:mx-0"
-                  id="hover-link"
+                  className="flex items-center justify-between gap-2 group mx-7 md:mx-0 hover:scale-125 transition-transform"
                 >
                   <span>{item.label}</span>
                   <span className="flex-1 border-b border-dotted border-current opacity-30 mx-2 group-hover:opacity-50 transition-opacity" />
