@@ -85,6 +85,7 @@ type SourdoughLoaf = {
   starterFedTime: string | null;
   starterFedDate: string | null;
   initialMixTime: string | null;
+  mixIndoorTemp: number | null;
   temperature: number | null;
   indoorTempMix: number | null;
   imageUrls: string[] | null;
@@ -406,18 +407,25 @@ function LoafCard({
         <div className="text-gray-700 text-sm font-medium mb-2">Mix</div>
         <div className="flex items-center gap-3 flex-wrap">
           {loaf.initialMixTime ? (
-            <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-              <EditableTime
-                time={loaf.initialMixTime}
-                onUpdate={(time) => onUpdate({ initialMixTime: time })}
+            <>
+              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                <EditableTime
+                  time={loaf.initialMixTime}
+                  onUpdate={(time) => onUpdate({ initialMixTime: time })}
+                />
+                <button
+                  onClick={() => onUpdate({ initialMixTime: null, mixIndoorTemp: null })}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </span>
+              <TempInput
+                value={loaf.mixIndoorTemp}
+                onUpdate={(temp) => onUpdate({ mixIndoorTemp: temp })}
+                placeholder="Indoor"
               />
-              <button
-                onClick={() => onUpdate({ initialMixTime: null })}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ×
-              </button>
-            </span>
+            </>
           ) : (
             <button
               onClick={() => {

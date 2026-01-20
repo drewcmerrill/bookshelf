@@ -64,6 +64,7 @@ export async function PUT(
         starterFedTime: body.starterFedTime,
         starterFedDate: body.starterFedDate,
         initialMixTime: body.initialMixTime,
+        mixIndoorTemp: body.mixIndoorTemp,
         temperature: body.temperature,
         indoorTempMix: body.indoorTempMix,
         imageUrls: body.imageUrls,

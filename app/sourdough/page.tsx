@@ -79,6 +79,7 @@ type SourdoughLoaf = {
   starterFedTime: string | null;
   starterFedDate: string | null;
   initialMixTime: string | null;
+  mixIndoorTemp: number | null;
   temperature: number | null;
   indoorTempMix: number | null;
   imageUrls: string[] | null;
@@ -239,6 +240,11 @@ export default function SourdoughPage() {
                                   )
                                 : getMinutesBetween(loaf.starterFedTime, loaf.initialMixTime)
                             )} from feed)
+                          </span>
+                        )}
+                        {loaf.mixIndoorTemp && (
+                          <span className="ml-2">
+                            • {loaf.mixIndoorTemp}°F inside
                           </span>
                         )}
                       </div>

@@ -60,8 +60,9 @@ model SourdoughLoaf {
   starterFedTime  String?  @db.VarChar(50)  // Time starter was fed before bake
   starterFedDate  String?  @db.VarChar(50)  // Date starter was fed (if different from loaf date)
   initialMixTime  String?  @db.VarChar(50)  // Time dough was mixed (optional, set later)
-  temperature     Int?     // Outside temperature in °F at time of mix
-  indoorTempMix   Int?     // Indoor temperature in °F at time of mix
+  mixIndoorTemp   Int?     // Indoor temperature in °F at time of mix
+  temperature     Int?     // Outside temperature in °F at time of starter feed
+  indoorTempMix   Int?     // Indoor temperature in °F at time of starter feed
   imageUrls       Json?    // Array of Vercel Blob URLs for loaf photos
   flourGrams      Int?
   flourType       String?  @db.VarChar(255)
