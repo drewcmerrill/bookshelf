@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Playfair_Display } from "next/font/google";
+import { Tangerine } from "next/font/google";
 
-const playfair = Playfair_Display({
+const tangerine = Tangerine({
   subsets: ["latin"],
-  style: ["italic"],
+  weight: "700",
 });
 
 function formatTime(time: string): string {
@@ -150,7 +150,7 @@ export default function SourdoughPage() {
           </svg>
           Back
         </Link>
-        <h1 className={`${playfair.className} text-2xl italic text-slate-900`}>
+        <h1 className={`${tangerine.className} text-5xl  text-slate-900`}>
           Sourdough Log
         </h1>
         <Link
@@ -164,13 +164,13 @@ export default function SourdoughPage() {
       {/* Intro Section */}
       <div className="max-w-2xl mx-auto w-full px-4 pt-6">
         <div className="prose prose-slate text-lg text-slate-600 leading-relaxed">
-          <p>
+          {/* <p>
             I love sourdough, and I love making it. But it's the worst feeling
             in the world when you labor for two days to make the perfect loaf
             only for it to come out as flat as a hockey puck. So I made this
             website to track every variable I can think of that could contribute
             to the potency of my oven rises.
-          </p>
+          </p> */}
         </div>
       </div>
 
@@ -210,9 +210,13 @@ export default function SourdoughPage() {
                     {loaf.starterFedTime && (
                       <div className="text-slate-500 text-sm">
                         Starter fed at {formatTime(loaf.starterFedTime)}
-                        {loaf.starterFedDate && loaf.starterFedDate !== new Date(loaf.date).toISOString().split("T")[0] && (
-                          <span className="text-slate-400 ml-1">(prev day)</span>
-                        )}
+                        {loaf.starterFedDate &&
+                          loaf.starterFedDate !==
+                            new Date(loaf.date).toISOString().split("T")[0] && (
+                            <span className="text-slate-400 ml-1">
+                              (prev day)
+                            </span>
+                          )}
                         {loaf.temperature && (
                           <span className="ml-2">
                             • {loaf.temperature}°F outside
@@ -230,16 +234,27 @@ export default function SourdoughPage() {
                         Mixed at {formatTime(loaf.initialMixTime)}
                         {loaf.starterFedTime && (
                           <span className="text-slate-400 ml-1">
-                            (+{formatDuration(
-                              loaf.starterFedDate && loaf.starterFedDate !== new Date(loaf.date).toISOString().split("T")[0]
+                            (+
+                            {formatDuration(
+                              loaf.starterFedDate &&
+                                loaf.starterFedDate !==
+                                  new Date(loaf.date)
+                                    .toISOString()
+                                    .split("T")[0]
                                 ? getMinutesBetweenWithDates(
                                     loaf.starterFedTime,
                                     loaf.starterFedDate,
                                     loaf.initialMixTime,
-                                    new Date(loaf.date).toISOString().split("T")[0]
+                                    new Date(loaf.date)
+                                      .toISOString()
+                                      .split("T")[0],
                                   )
-                                : getMinutesBetween(loaf.starterFedTime, loaf.initialMixTime)
-                            )} from feed)
+                                : getMinutesBetween(
+                                    loaf.starterFedTime,
+                                    loaf.initialMixTime,
+                                  ),
+                            )}{" "}
+                            from feed)
                           </span>
                         )}
                         {loaf.mixIndoorTemp && (

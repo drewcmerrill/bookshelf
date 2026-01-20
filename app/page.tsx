@@ -1,71 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { IM_Fell_Great_Primer_SC } from "next/font/google";
+
+const FellGreatPrimer = IM_Fell_Great_Primer_SC({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export default function Home() {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "dark") {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
-
   return (
     <main
-      className="min-h-screen px-6 py-12 md:py-24 bg-cover bg-center bg-no-repeat"
+      className={`${FellGreatPrimer.className} min-h-screen px-6 py-12 md:py-24 bg-cover bg-center bg-no-repeat`}
       style={{ backgroundImage: "url('/paper-texture.jpg')" }}
     >
       <div className="max-w-md mx-auto">
-        <header className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">
+        <header className="mb-12 text-center">
+          <h1 className="text-4xl md:text-6xl font-semibold tracking-tight mb-2">
             Drew Merrill
           </h1>
-          <p className="text-[var(--muted)] text-lg">
-            Building things for the web
-          </p>
         </header>
 
         <nav className="mb-12">
-          <ul className="space-y-3 text-lg">
-            <li>
-              <Link href="/bookshelf">Bookshelf</Link>
-            </li>
-            <li>
-              <Link href="/krypto">Krypto</Link>
-            </li>
-            <li>
-              <Link href="/jeopardy">Jeopardy</Link>
-            </li>
-            <li>
-              <Link href="/sourdough">Sourdough Log</Link>
-            </li>
+          <ul className="space-y-2 text-2xl md:text-2xl">
+            {[
+              { href: "/bookshelf", label: "Bookshelf", numeral: "I" },
+              { href: "/krypto", label: "Krypto", numeral: "II" },
+              { href: "/jeopardy", label: "Jeopardy", numeral: "III" },
+              { href: "/sourdough", label: "Sourdough Log", numeral: "IV" },
+            ].map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="flex items-center justify-between gap-2 group mx-7 md:mx-0"
+                  id="hover-link"
+                >
+                  <span>{item.label}</span>
+                  <span className="flex-1 border-b border-dotted border-current opacity-30 mx-2 group-hover:opacity-50 transition-opacity" />
+                  <span>{item.numeral}</span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
 
-        <footer className="flex items-center justify-between text-sm text-[var(--muted)]">
+        <footer className="text-lg text-[var(--muted)] text-center">
           <span>v. I</span>
-          <button
-            onClick={toggleTheme}
-            className="hover:text-[var(--foreground)] transition-colors cursor-pointer"
-          >
-            {isDark ? "light" : "dark"} mode
-          </button>
         </footer>
       </div>
     </main>
