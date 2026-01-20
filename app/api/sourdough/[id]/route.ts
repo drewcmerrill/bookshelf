@@ -76,6 +76,7 @@ export async function PUT(
         secondProofTime: body.secondProofTime,
         secondProofLocation: body.secondProofLocation,
         secondProofIndoorTemp: body.secondProofIndoorTemp,
+        dutchOven: body.dutchOven,
         bakeEvents: body.bakeEvents,
         bakeEndTime: body.bakeEndTime,
         bakeEndDate: body.bakeEndDate,

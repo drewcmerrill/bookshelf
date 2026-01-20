@@ -97,6 +97,7 @@ type SourdoughLoaf = {
   secondProofTime: string | null;
   secondProofLocation: string | null;
   secondProofIndoorTemp: number | null;
+  dutchOven: string | null;
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
@@ -109,6 +110,11 @@ const PROOF_LOCATIONS = [
   { value: "counter", label: "Counter" },
   { value: "oven", label: "Oven" },
   { value: "fridge", label: "Fridge" },
+];
+
+const DUTCH_OVEN_OPTIONS = [
+  { value: "cast-iron", label: "Cast Iron" },
+  { value: "ceramic", label: "Ceramic" },
 ];
 
 export default function AdminSourdoughPage() {
@@ -577,6 +583,24 @@ function LoafCard({
             </svg>
             Add
           </button>
+        </div>
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-gray-600 text-sm">Dutch Oven</span>
+          <div className="flex gap-2">
+            {DUTCH_OVEN_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => onUpdate({ dutchOven: loaf.dutchOven === option.value ? null : option.value })}
+                className={`text-sm px-3 py-1.5 rounded-lg transition-colors ${
+                  loaf.dutchOven === option.value
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
         {loaf.bakeEvents && loaf.bakeEvents.length > 0 ? (
           <div className="space-y-2">

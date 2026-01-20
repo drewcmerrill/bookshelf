@@ -72,6 +72,7 @@ model SourdoughLoaf {
   secondProofTime    String?  @db.VarChar(50)  // Time second proof started
   secondProofLocation String? @db.VarChar(50)  // "oven", "counter", or "fridge"
   secondProofIndoorTemp Int?  // Indoor temperature when second proof started
+  dutchOven       String?  @db.VarChar(50)  // "cast-iron" or "ceramic"
   bakeEvents      Json?    // Array of {time, temp, date?}, e.g., [{"time": "14:00", "temp": 450, "date": "2024-01-15"}]
   bakeEndTime     String?  @db.VarChar(50)  // Time loaf was removed from oven
   bakeEndDate     String?  @db.VarChar(50)  // Date loaf was removed (if different from loaf date)

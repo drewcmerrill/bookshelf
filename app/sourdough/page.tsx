@@ -81,6 +81,7 @@ type SourdoughLoaf = {
   secondProofTime: string | null;
   secondProofLocation: string | null;
   secondProofIndoorTemp: number | null;
+  dutchOven: string | null;
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
@@ -332,10 +333,16 @@ export default function SourdoughPage() {
                     const bakeSpansMultipleDays = events.some(e => e.date && e.date !== loafDateStr) ||
                       (loaf.bakeEndDate && loaf.bakeEndDate !== loafDateStr);
 
+                    const dutchOvenLabel = loaf.dutchOven === "cast-iron" ? "Cast Iron" : loaf.dutchOven === "ceramic" ? "Ceramic" : null;
+
                     return (
                       <div>
                         <span className="text-slate-500 text-sm">
-                          Baking — In @ {formatTime(events[0].time)}
+                          Baking
+                          {dutchOvenLabel && (
+                            <span className="text-slate-400 ml-1">({dutchOvenLabel})</span>
+                          )}
+                          {" "}— In @ {formatTime(events[0].time)}
                           {bakeSpansMultipleDays && (
                             <span className="text-slate-400 ml-1">(next day)</span>
                           )}
@@ -412,19 +419,7 @@ export default function SourdoughPage() {
 
                   {/* Photos */}
                   {loaf.imageUrls && loaf.imageUrls.length > 0 && (
-                    <div>
-                      <span className="text-slate-500 text-sm">Photos</span>
-                      <div className="mt-1 flex flex-wrap gap-2">
-                        {loaf.imageUrls.map((url, idx) => (
-                          <img
-                            key={url}
-                            src={url}
-                            alt={`Loaf ${loafNumber} photo ${idx + 1}`}
-                            className="w-full max-w-xs rounded-lg border border-slate-200"
-                          />
-                        ))}
-                      </div>
-                    </div>
+                    <PhotosSection imageUrls={loaf.imageUrls} loafNumber={loafNumber} />
                   )}
                 </div>
               );
@@ -432,6 +427,41 @@ export default function SourdoughPage() {
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+function PhotosSection({ imageUrls, loafNumber }: { imageUrls: string[]; loafNumber: number }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-slate-500 text-sm flex items-center gap-1 hover:text-slate-700 transition-colors"
+      >
+        <svg
+          className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        View Photos ({imageUrls.length})
+      </button>
+      {expanded && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {imageUrls.map((url, idx) => (
+            <img
+              key={url}
+              src={url}
+              alt={`Loaf ${loafNumber} photo ${idx + 1}`}
+              className="w-full max-w-xs rounded-lg border border-slate-200"
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
