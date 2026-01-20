@@ -294,13 +294,12 @@ export default function SourdoughPage() {
                               : typeof prevFold === "string"
                                 ? prevFold
                                 : prevFold.time;
-                          const duration = getMinutesBetween(
-                            prevTime,
-                            foldTime,
-                          );
+                          const duration = prevTime
+                            ? getMinutesBetween(prevTime, foldTime)
+                            : null;
                           return (
                             <div key={idx} className="flex items-center gap-2">
-                              {idx > 0 && (
+                              {idx > 0 && duration !== null && (
                                 <span className="text-slate-400 text-xs">
                                   +{formatDuration(duration)}
                                 </span>
@@ -312,7 +311,7 @@ export default function SourdoughPage() {
                                     ({foldIndoorTemp}°F)
                                   </span>
                                 )}
-                                {idx === 0 && (
+                                {idx === 0 && duration !== null && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     (+{formatDuration(duration)} from mix)
                                   </span>
