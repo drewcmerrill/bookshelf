@@ -27,7 +27,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen px-6 py-12 md:py-24">
+    <main
+      className="min-h-screen px-6 py-12 md:py-24 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/paper-texture.jpg')" }}
+    >
       <div className="max-w-md mx-auto">
         <header className="mb-12">
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">
