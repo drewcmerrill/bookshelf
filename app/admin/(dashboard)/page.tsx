@@ -14,7 +14,6 @@ export default async function AdminDashboard() {
   });
   const totalPages = totalPagesResult._sum.pages || 0;
 
-
   // Get all books with genres and count individual genres (split by comma)
   const booksWithGenres = await prisma.book.findMany({
     where: { genre: { not: null } },
@@ -42,13 +41,40 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          Dashboard
-        </h1>
-        <p className="text-gray-500 mt-1 text-sm sm:text-base">
-          Welcome back! Here's an overview of your bookshelf.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Dashboard
+          </h1>
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">
+            Welcome back! Here's an overview of your bookshelf.
+          </p>
+        </div>
+        <Link
+          href="/bookshelf"
+          className="text-gray-500 hover:text-gray-700 transition-colors text-sm flex items-center gap-1"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
+          </svg>
+          View Public Page
+        </Link>
       </div>
 
       {/* Stats Grid */}
@@ -316,7 +342,6 @@ export default async function AdminDashboard() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
