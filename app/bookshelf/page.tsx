@@ -3,6 +3,12 @@ import { Stats } from "@/components/Stats";
 import { prisma } from "@/lib/prisma";
 import { Book } from "@/data/types";
 import Link from "next/link";
+import { Tangerine } from "next/font/google";
+
+const tangerine = Tangerine({
+  subsets: ["latin"],
+  weight: "700",
+});
 
 export const dynamic = "force-dynamic";
 
@@ -37,61 +43,46 @@ export default async function BookshelfPage() {
 
   return (
     <div
-      className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen bg-cover bg-center bg-no-repeat"
+      className="min-h-screen bg-slate-50 flex flex-col bg-cover bg-center bg-no-repeat gap-0  "
       style={{ backgroundImage: "url('/paper-texture.jpg')" }}
     >
-      {/* Back Button */}
-      <Link
-        href="/"
-        className="fixed top-6 left-6 sm:top-4 sm:left-4 z-50 p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors group"
-        title="Back to Home"
-      >
-        <svg
-          className="w-5 h-5 text-gray-600 group-hover:text-gray-800 transition-colors"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <header className="bg-white border-b border-slate-200 px-4 py-4 flex justify-between items-center mb-5">
+        <Link
+          href="/"
+          className="text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-          />
-        </svg>
-      </Link>
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back
+        </Link>
+        <div className="flex items-center gap-3">
+          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
+          <h1 className={`${tangerine.className} text-5xl text-slate-900`}>
+            My Bookshelf
+          </h1>
+          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
+        </div>
 
-      {/* Admin Login Button */}
-      <Link
-        href="/admin"
-        className="fixed top-6 right-6 sm:top-4 sm:right-4 z-50 p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors group"
-        title="Admin Login"
-      >
-        <svg
-          className="w-5 h-5 text-gray-600 group-hover:text-gray-800 transition-colors"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <Link
+          href="/admin"
+          className="text-slate-400 hover:text-slate-600 transition-colors text-sm"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-        </svg>
-      </Link>
-
-      <main className="flex flex-col gap-0 row-start-2 items-center ">
-        <Stats books={books}></Stats>
-        <Shelf books={books}></Shelf>
-      </main>
+          Edit
+        </Link>
+      </header>
+      <Stats books={books}></Stats>
+      <Shelf books={books}></Shelf>
     </div>
   );
 }

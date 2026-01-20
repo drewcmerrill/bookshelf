@@ -153,9 +153,13 @@ export default function SourdoughPage() {
           </svg>
           Back
         </Link>
-        <h1 className={`${tangerine.className} text-5xl  text-slate-900`}>
-          Sourdough Log
-        </h1>
+        <div className="flex items-center gap-3">
+          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
+          <h1 className={`${tangerine.className} text-5xl text-slate-900`}>
+            Sourdough Log
+          </h1>
+          <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
+        </div>
         <Link
           href="/admin/sourdough"
           className="text-slate-400 hover:text-slate-600 transition-colors text-sm"

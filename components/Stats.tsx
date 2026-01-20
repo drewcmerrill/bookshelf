@@ -44,7 +44,7 @@ export function Stats({ books }: StatsProps) {
         }}
       >
         {/* Header */}
-        <div className="relative px-6 pt-6 pb-4">
+        {/* <div className="relative px-6 pt-6 pb-4">
           <div className="flex items-center justify-center gap-3 mb-1">
             <div className="h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent flex-1 max-w-16" />
             <svg
@@ -64,10 +64,10 @@ export function Stats({ books }: StatsProps) {
           </p>
         </div>
 
-        {/* Decorative divider */}
+   
         <div className="px-8">
           <div className="h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
-        </div>
+        </div> */}
 
         {/* Stats Grid */}
         <div className="px-6 py-5">
@@ -84,30 +84,30 @@ export function Stats({ books }: StatsProps) {
 
             {/* To Read */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#0f172b]">
+              <div className="text-3xl font-bold text-slate-900">
                 {totalUnreadBooks}
               </div>
-              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+              <div className="text-xs text-slate-900 uppercase tracking-wider mt-1">
                 To Read
               </div>
             </div>
 
             {/* Pages Read */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#0f172b]">
+              <div className="text-3xl font-bold text-slate-900">
                 {totalReadPages.toLocaleString()}
               </div>
-              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+              <div className="text-xs text-slate-900 uppercase tracking-wider mt-1">
                 Pages Read
               </div>
             </div>
 
             {/* Avg Pages */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#0f172b]">
+              <div className="text-3xl font-bold text-slate-900">
                 {averagePages}
               </div>
-              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+              <div className="text-xs text-slate-900 uppercase tracking-wider mt-1">
                 Avg Pages
               </div>
             </div>
@@ -116,7 +116,7 @@ export function Stats({ books }: StatsProps) {
           {/* Average Rating (if available) */}
           {averageRating && (
             <div className="mt-4 flex items-center justify-center gap-2">
-              <span className="text-sm text-[#0f172b]">Average Rating:</span>
+              <span className="text-sm text-slate-900">Average Rating:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <svg
@@ -137,7 +137,7 @@ export function Stats({ books }: StatsProps) {
                     />
                   </svg>
                 ))}
-                <span className="text-sm font-medium text-[#0f172b] ml-1">
+                <span className="text-sm font-medium text-slate-900 ml-1">
                   {averageRating}
                 </span>
               </div>
