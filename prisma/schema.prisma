@@ -59,7 +59,7 @@ model SourdoughLoaf {
   date            DateTime @default(now())
   starterFedTime  String?  @db.VarChar(50)  // Time starter was fed before bake
   starterFedDate  String?  @db.VarChar(50)  // Date starter was fed (if different from loaf date)
-  initialMixTime  String   @db.VarChar(50)  // e.g., "9:30 AM"
+  initialMixTime  String?  @db.VarChar(50)  // Time dough was mixed (optional, set later)
   temperature     Int?     // Outside temperature in °F at time of mix
   indoorTempMix   Int?     // Indoor temperature in °F at time of mix
   imageUrls       Json?    // Array of Vercel Blob URLs for loaf photos
@@ -78,7 +78,6 @@ model SourdoughLoaf {
   bakeEvents      Json?    // Array of {time, temp, date?}, e.g., [{"time": "14:00", "temp": 450, "date": "2024-01-15"}]
   bakeEndTime     String?  @db.VarChar(50)  // Time loaf was removed from oven
   bakeEndDate     String?  @db.VarChar(50)  // Date loaf was removed (if different from loaf date)
-  internalTemp    Int?     // Internal temperature of finished loaf in °F
   crossSectionWidth  Float?  // Width of cross section in inches
   crossSectionHeight Float?  // Height of cross section in inches
   notes           String?  @db.Text

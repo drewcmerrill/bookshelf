@@ -22,9 +22,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.initialMixTime) {
+    if (!body.starterFedTime) {
       return NextResponse.json(
-        { error: "Initial mix time is required" },
+        { error: "Starter fed time is required" },
         { status: 400 }
       );
     }
@@ -32,7 +32,9 @@ export async function POST(request: NextRequest) {
     const loaf = await prisma.sourdoughLoaf.create({
       data: {
         date: body.date ? new Date(body.date) : new Date(),
-        initialMixTime: body.initialMixTime,
+        starterFedTime: body.starterFedTime,
+        starterFedDate: body.starterFedDate || null,
+        initialMixTime: body.initialMixTime || null,
         temperature: body.temperature || null,
         flourGrams: body.flourGrams || null,
         flourType: body.flourType || null,
