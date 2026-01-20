@@ -12,7 +12,7 @@ export default async function BookshelfPage() {
   });
 
   // Transform Prisma types to match existing Book type
-  const books: Book[] = dbBooks.map((book: typeof dbBooks[number]) => ({
+  const books: Book[] = dbBooks.map((book: (typeof dbBooks)[number]) => ({
     title: book.title,
     img: book.img,
     height: book.height,
@@ -36,7 +36,10 @@ export default async function BookshelfPage() {
   }));
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen">
+    <div
+      className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/paper-texture.jpg')" }}
+    >
       {/* Back Button */}
       <Link
         href="/"

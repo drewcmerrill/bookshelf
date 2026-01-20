@@ -128,7 +128,10 @@ export default function SourdoughPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div
+      className="min-h-screen bg-slate-50 flex flex-col bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/paper-texture.jpg')" }}
+    >
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-4 py-4 flex justify-between items-center">
         <Link
@@ -320,7 +323,7 @@ export default function SourdoughPage() {
                             : null;
                           return (
                             <div key={idx} className="flex items-center gap-2">
-                              {idx > 0 && duration !== null && (
+                              {duration !== null && (
                                 <span className="text-slate-400 text-xs">
                                   +{formatDuration(duration)}
                                 </span>
@@ -330,11 +333,6 @@ export default function SourdoughPage() {
                                 {foldIndoorTemp && (
                                   <span className="text-slate-400 text-xs ml-1">
                                     ({foldIndoorTemp}°F)
-                                  </span>
-                                )}
-                                {idx === 0 && duration !== null && (
-                                  <span className="text-slate-400 text-xs ml-1">
-                                    (+{formatDuration(duration)} from mix)
                                   </span>
                                 )}
                               </span>
@@ -420,12 +418,13 @@ export default function SourdoughPage() {
                                         — {formatDuration(firstProofDuration)}
                                       </span>
                                     )}
+                                  {mixToFirstProof && mixToFirstProof > 0 && (
+                                    <span className="text-slate-400 text-xs ml-1">
+                                      (+{formatDuration(mixToFirstProof)} from
+                                      mix)
+                                    </span>
+                                  )}
                                 </span>
-                                {mixToFirstProof && mixToFirstProof > 0 && (
-                                  <span className="text-slate-400 text-xs">
-                                    +{formatDuration(mixToFirstProof)} from mix
-                                  </span>
-                                )}
                               </div>
                             )}
                             {loaf.secondProofTime && (
@@ -515,7 +514,7 @@ export default function SourdoughPage() {
                               </span>
                             )}
                           </span>
-                          <div className="flex flex-wrap gap-2 mt-1">
+                          <div className="flex flex-col gap-2 mt-1">
                             {events.map((event, idx) => {
                               const currentDate = getEventDate(event);
                               const nextEvent =

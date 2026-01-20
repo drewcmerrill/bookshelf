@@ -15,49 +15,58 @@ export function Stats({ books }: StatsProps) {
   const averagePages =
     books.length > 0
       ? Math.round(
-          books.reduce((sum, book) => sum + (book.pages || 0), 0) / books.length
+          books.reduce((sum, book) => sum + (book.pages || 0), 0) /
+            books.length,
         )
       : 0;
 
   // Get average rating of rated books
   const ratedBooks = books.filter((book) => book.ratingOverall);
-  const averageRating = ratedBooks.length > 0
-    ? (ratedBooks.reduce((sum, book) => sum + (book.ratingOverall || 0), 0) / ratedBooks.length).toFixed(1)
-    : null;
+  const averageRating =
+    ratedBooks.length > 0
+      ? (
+          ratedBooks.reduce((sum, book) => sum + (book.ratingOverall || 0), 0) /
+          ratedBooks.length
+        ).toFixed(1)
+      : null;
 
   return (
     <div className="w-full flex justify-center mb-6">
       <div
-        className="max-w-4xl w-full mx-4 overflow-hidden"
+        className="max-w-4xl w-full mx-4 overflow-hidden bg-white border border-slate-200 rounded-lg p-4 space-y-4 shadow-sm"
         style={{
-          background: "linear-gradient(135deg, #fef9ed 0%, #f5ebe0 100%)",
+          // background: "linear-gradient(135deg, #fef9ed 0%, #f5ebe0 100%)",
           fontFamily: "'Georgia', serif",
-          border: "2px solid #A07A55",
-          boxShadow:
-            "0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5)",
-          borderRadius: "2px",
+          // border: "2px solid #A07A55",
+          // boxShadow:
+          // "0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5)",
+          // borderRadius: "2px",
         }}
       >
         {/* Header */}
         <div className="relative px-6 pt-6 pb-4">
           <div className="flex items-center justify-center gap-3 mb-1">
-            <div className="h-px bg-gradient-to-r from-transparent via-[#A07A55] to-transparent flex-1 max-w-16" />
-            <svg className="w-6 h-6 text-[#8B6B4F]" fill="currentColor" viewBox="0 0 24 24">
+            <div className="h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent flex-1 max-w-16" />
+            <svg
+              className="w-6 h-6 text-slate-900"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            <div className="h-px bg-gradient-to-r from-transparent via-[#A07A55] to-transparent flex-1 max-w-16" />
+            <div className="h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent flex-1 max-w-16" />
           </div>
-          <h1 className="text-center text-3xl text-[#3d2e1f] tracking-wide">
+          <h1 className="text-center text-3xl text-[#0f172b] tracking-wide">
             My Bookshelf
           </h1>
-          <p className="text-center text-[#6b5a4a] text-sm mt-1 italic">
+          <p className="text-center text-slate-700 text-sm mt-1 italic">
             A collection of {totalBooks} books
           </p>
         </div>
 
         {/* Decorative divider */}
         <div className="px-8">
-          <div className="h-px bg-gradient-to-r from-transparent via-[#c4a77d] to-transparent" />
+          <div className="h-px bg-gradient-to-r from-transparent via-[#0f172b] to-transparent" />
         </div>
 
         {/* Stats Grid */}
@@ -65,33 +74,49 @@ export function Stats({ books }: StatsProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Books Read */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#2d5a27]">{totalReadBooks}</div>
-              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">Books Read</div>
+              <div className="text-3xl font-bold text-slate-900">
+                {totalReadBooks}
+              </div>
+              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+                Books Read
+              </div>
             </div>
 
             {/* To Read */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#8b5a2b]">{totalUnreadBooks}</div>
-              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">To Read</div>
+              <div className="text-3xl font-bold text-[#0f172b]">
+                {totalUnreadBooks}
+              </div>
+              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+                To Read
+              </div>
             </div>
 
             {/* Pages Read */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#3d2e1f]">{totalReadPages.toLocaleString()}</div>
-              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">Pages Read</div>
+              <div className="text-3xl font-bold text-[#0f172b]">
+                {totalReadPages.toLocaleString()}
+              </div>
+              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+                Pages Read
+              </div>
             </div>
 
             {/* Avg Pages */}
             <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-[#3d2e1f]">{averagePages}</div>
-              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">Avg Pages</div>
+              <div className="text-3xl font-bold text-[#0f172b]">
+                {averagePages}
+              </div>
+              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+                Avg Pages
+              </div>
             </div>
           </div>
 
           {/* Average Rating (if available) */}
           {averageRating && (
             <div className="mt-4 flex items-center justify-center gap-2">
-              <span className="text-sm text-[#6b5a4a]">Average Rating:</span>
+              <span className="text-sm text-[#0f172b]">Average Rating:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <svg
@@ -112,14 +137,16 @@ export function Stats({ books }: StatsProps) {
                     />
                   </svg>
                 ))}
-                <span className="text-sm font-medium text-[#3d2e1f] ml-1">{averageRating}</span>
+                <span className="text-sm font-medium text-[#0f172b] ml-1">
+                  {averageRating}
+                </span>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer decoration */}
-        <div className="h-2 bg-gradient-to-r from-[#A07A55] via-[#c4a77d] to-[#A07A55]" />
+        {/* <div className="h-2 bg-gradient-to-r from-[#0f172b] via-[#0f172b] to-[#0f172b]" /> */}
       </div>
     </div>
   );
