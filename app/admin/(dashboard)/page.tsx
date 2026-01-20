@@ -32,8 +32,7 @@ export default async function AdminDashboard() {
 
   const genreCounts = Array.from(genreCountMap.entries())
     .map(([genre, count]) => ({ genre, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+    .sort((a, b) => b.count - a.count);
 
   const readPercentage =
     totalBooks > 0 ? Math.round((readBooks / totalBooks) * 100) : 0;
@@ -311,9 +310,7 @@ export default async function AdminDashboard() {
 
         {/* Top Genres */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Top Genres
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Genres</h2>
           <div className="space-y-3">
             {genreCounts.map((item, index) => {
               const percentage = Math.round((item.count / totalBooks) * 100);
@@ -323,6 +320,43 @@ export default async function AdminDashboard() {
                 "bg-purple-500",
                 "bg-amber-500",
                 "bg-pink-500",
+                "bg-red-500",
+                "bg-blue-500",
+                "bg-green-500",
+                "bg-purple-500",
+                "bg-amber-500",
+                "bg-pink-500",
+                "bg-red-500",
+                "bg-blue-500",
+                "bg-green-500",
+                "bg-purple-500",
+                "bg-amber-500",
+                "bg-pink-500",
+                "bg-red-500",
+                "bg-blue-500",
+                "bg-green-500",
+                "bg-purple-500",
+                "bg-amber-500",
+                "bg-pink-500",
+                "bg-red-500",
+                "bg-blue-500",
+                "bg-green-500",
+                "bg-purple-500",
+                "bg-amber-500",
+                "bg-pink-500",
+                "bg-red-500",
+                "bg-blue-500",
+                "bg-green-500",
+                "bg-purple-500",
+                "bg-amber-500",
+                "bg-pink-500",
+                "bg-red-500",
+                "bg-blue-500",
+                "bg-green-500",
+                "bg-purple-500",
+                "bg-amber-500",
+                "bg-pink-500",
+                "bg-red-500",
               ];
               return (
                 <div key={item.genre}>
@@ -333,7 +367,7 @@ export default async function AdminDashboard() {
                   <div className="w-full bg-gray-100 rounded-full h-2">
                     <div
                       className={`${colors[index]} h-2 rounded-full transition-all`}
-                      style={{ width: `${percentage}%` }}
+                      style={{ width: `${percentage + 1}%` }}
                     />
                   </div>
                 </div>
