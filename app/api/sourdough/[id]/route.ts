@@ -61,6 +61,8 @@ export async function PUT(
       where: { id: parseInt(id) },
       data: {
         date: body.date ? new Date(body.date) : undefined,
+        starterFedTime: body.starterFedTime,
+        starterFedDate: body.starterFedDate,
         initialMixTime: body.initialMixTime,
         temperature: body.temperature,
         indoorTempMix: body.indoorTempMix,
