@@ -161,6 +161,7 @@ export default function AdminSourdoughPage() {
     try {
       const now = new Date();
       const time = now.toTimeString().slice(0, 5);
+      const dateStr = now.toISOString().split("T")[0];
       const temperature = await fetchGilbertTemperature();
 
       const res = await fetch("/api/sourdough", {
@@ -169,6 +170,7 @@ export default function AdminSourdoughPage() {
         body: JSON.stringify({
           date: now.toISOString(),
           starterFedTime: time,
+          starterFedDate: dateStr,
           temperature,
         }),
       });
