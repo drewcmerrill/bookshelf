@@ -25,9 +25,9 @@ export default function Home() {
           <ul className="space-y-2 text-2xl md:text-2xl">
             {[
               { href: "/bookshelf", label: "Bookshelf", numeral: "I" },
-              { href: "/krypto", label: "Krypto", numeral: "II" },
+              { href: "/sourdough", label: "Sourdough Log", numeral: "II" },
               { href: "/jeopardy", label: "Jeopardy", numeral: "III" },
-              { href: "/sourdough", label: "Sourdough Log", numeral: "IV" },
+              { href: "/krypto", label: "Krypto", numeral: "IV" },
             ].map((item) => (
               <li key={item.href}>
                 <Link

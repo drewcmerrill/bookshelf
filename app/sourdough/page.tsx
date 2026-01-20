@@ -299,7 +299,7 @@ export default function SourdoughPage() {
                       <span className="text-slate-500 text-sm">
                         Stretch & Folds
                       </span>
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <div className="flex flex-col items-start gap-2 mt-1">
                         {loaf.stretchFolds.map((fold, idx) => {
                           // Handle both old string format and new object format
                           const foldTime =
@@ -397,7 +397,7 @@ export default function SourdoughPage() {
                       return (
                         <div className="space-y-1 text-sm">
                           <span className="text-slate-500">Proofing</span>
-                          <div className="flex flex-wrap gap-3 mt-1">
+                          <div className="flex flex-col items-start gap-3 mt-1">
                             {loaf.firstProofTime && (
                               <div className="flex items-center gap-2">
                                 <span className="text-slate-500">1st:</span>
