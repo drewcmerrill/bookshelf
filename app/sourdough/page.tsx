@@ -76,6 +76,8 @@ type StretchFold =
 type SourdoughLoaf = {
   id: number;
   date: string;
+  starterFedTime: string | null;
+  starterFedDate: string | null;
   initialMixTime: string;
   temperature: number | null;
   indoorTempMix: number | null;
@@ -95,6 +97,7 @@ type SourdoughLoaf = {
   bakeEvents: BakeEvent[] | null;
   bakeEndTime: string | null;
   bakeEndDate: string | null;
+  internalTemp: number | null;
   crossSectionWidth: number | null;
   crossSectionHeight: number | null;
   notes: string | null;
@@ -204,8 +207,30 @@ export default function SourdoughPage() {
                         day: "numeric",
                       })}
                     </div>
+                    {loaf.starterFedTime && (
+                      <div className="text-slate-500 text-sm">
+                        Starter fed at {formatTime(loaf.starterFedTime)}
+                        {loaf.starterFedDate && loaf.starterFedDate !== new Date(loaf.date).toISOString().split("T")[0] && (
+                          <span className="text-slate-400 ml-1">(prev day)</span>
+                        )}
+                      </div>
+                    )}
                     <div className="text-slate-500 text-sm">
                       Mixed at {formatTime(loaf.initialMixTime)}
+                      {loaf.starterFedTime && (
+                        <span className="text-slate-400 ml-1">
+                          (+{formatDuration(
+                            loaf.starterFedDate && loaf.starterFedDate !== new Date(loaf.date).toISOString().split("T")[0]
+                              ? getMinutesBetweenWithDates(
+                                  loaf.starterFedTime,
+                                  loaf.starterFedDate,
+                                  loaf.initialMixTime,
+                                  new Date(loaf.date).toISOString().split("T")[0]
+                                )
+                              : getMinutesBetween(loaf.starterFedTime, loaf.initialMixTime)
+                          )} from feed)
+                        </span>
+                      )}
                       {loaf.temperature && (
                         <span className="ml-2">
                           • {loaf.temperature}°F outside
@@ -494,6 +519,11 @@ export default function SourdoughPage() {
                             {loaf.bakeEndTime && (
                               <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
                                 Out @ {formatTime(loaf.bakeEndTime)}
+                                {loaf.internalTemp && (
+                                  <span className="text-slate-400 text-xs ml-1">
+                                    ({loaf.internalTemp}°F internal)
+                                  </span>
+                                )}
                               </span>
                             )}
                           </div>

@@ -1,181 +1,70 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    if (newTheme) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
-      <div className="max-w-xl w-full">
-        {/* Header */}
-        <div className="text-center mb-12">
-          {/* <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">
+    <main className="min-h-screen px-6 py-12 md:py-24">
+      <div className="max-w-md mx-auto">
+        <header className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">
             Drew Merrill
-          </h1> */}
-        </div>
+          </h1>
+          <p className="text-[var(--muted)] text-lg">
+            Building things for the web
+          </p>
+        </header>
 
-        {/* Links */}
-        <div className="space-y-4">
-          <Link
-            href="/bookshelf"
-            className="group flex items-center gap-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
-          >
-            <div className="w-14 h-14 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-              <svg
-                className="w-7 h-7 text-amber-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-semibold text-white mb-1 group-hover:text-amber-400 transition-colors">
-                Bookshelf
-              </h2>
-              <p className="text-slate-400 text-sm">
-                My book collection and reading list
-              </p>
-            </div>
-            <svg
-              className="w-5 h-5 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
+        <nav className="mb-12">
+          <ul className="space-y-3 text-lg">
+            <li>
+              <Link href="/bookshelf">Bookshelf</Link>
+            </li>
+            <li>
+              <Link href="/krypto">Krypto</Link>
+            </li>
+            <li>
+              <Link href="/jeopardy">Jeopardy</Link>
+            </li>
+            <li>
+              <Link href="/sourdough">Sourdough Log</Link>
+            </li>
+          </ul>
+        </nav>
 
-          <Link
-            href="/krypto"
-            className="group flex items-center gap-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+        <footer className="flex items-center justify-between text-sm text-[var(--muted)]">
+          <span>v. I</span>
+          <button
+            onClick={toggleTheme}
+            className="hover:text-[var(--foreground)] transition-colors cursor-pointer"
           >
-            <div className="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-              <svg
-                className="w-7 h-7 text-emerald-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-semibold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                Krypto
-              </h2>
-              <p className="text-slate-400 text-sm">Math puzzle game</p>
-            </div>
-            <svg
-              className="w-5 h-5 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
-
-          <Link
-            href="/jeopardy"
-            className="group flex items-center gap-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
-          >
-            <div className="w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-              <svg
-                className="w-7 h-7 text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
-                Jeopardy
-              </h2>
-              <p className="text-slate-400 text-sm">Random trivia clues</p>
-            </div>
-            <svg
-              className="w-5 h-5 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
-
-          <Link
-            href="/sourdough"
-            className="group flex items-center gap-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
-          >
-            <div className="w-14 h-14 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-              <svg
-                className="w-7 h-7 text-orange-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                Sourdough Log
-              </h2>
-              <p className="text-slate-400 text-sm">Tracking my bread bakes</p>
-            </div>
-            <svg
-              className="w-5 h-5 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
-        </div>
+            {isDark ? "light" : "dark"} mode
+          </button>
+        </footer>
       </div>
-    </div>
+    </main>
   );
 }
