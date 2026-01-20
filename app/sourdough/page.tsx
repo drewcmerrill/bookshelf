@@ -212,6 +212,16 @@ export default function SourdoughPage() {
                         {loaf.starterFedDate && loaf.starterFedDate !== new Date(loaf.date).toISOString().split("T")[0] && (
                           <span className="text-slate-400 ml-1">(prev day)</span>
                         )}
+                        {loaf.temperature && (
+                          <span className="ml-2">
+                            • {loaf.temperature}°F outside
+                          </span>
+                        )}
+                        {loaf.indoorTempMix && (
+                          <span className="ml-2">
+                            • {loaf.indoorTempMix}°F inside
+                          </span>
+                        )}
                       </div>
                     )}
                     {loaf.initialMixTime && (
@@ -229,16 +239,6 @@ export default function SourdoughPage() {
                                   )
                                 : getMinutesBetween(loaf.starterFedTime, loaf.initialMixTime)
                             )} from feed)
-                          </span>
-                        )}
-                        {loaf.temperature && (
-                          <span className="ml-2">
-                            • {loaf.temperature}°F outside
-                          </span>
-                        )}
-                        {loaf.indoorTempMix && (
-                          <span className="ml-2">
-                            • {loaf.indoorTempMix}°F inside
                           </span>
                         )}
                       </div>

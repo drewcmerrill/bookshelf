@@ -161,6 +161,7 @@ export default function AdminSourdoughPage() {
     try {
       const now = new Date();
       const time = now.toTimeString().slice(0, 5);
+      const temperature = await fetchGilbertTemperature();
 
       const res = await fetch("/api/sourdough", {
         method: "POST",
@@ -168,6 +169,7 @@ export default function AdminSourdoughPage() {
         body: JSON.stringify({
           date: now.toISOString(),
           starterFedTime: time,
+          temperature,
         }),
       });
 
@@ -264,7 +266,6 @@ export default function AdminSourdoughPage() {
               onUpdate={(updates) => updateLoaf(loaf.id, updates)}
               onDelete={() => deleteLoaf(loaf.id)}
               calculateHydration={calculateHydration}
-              fetchGilbertTemperature={fetchGilbertTemperature}
             />
           ))}
         </div>
@@ -279,14 +280,12 @@ function LoafCard({
   onUpdate,
   onDelete,
   calculateHydration,
-  fetchGilbertTemperature,
 }: {
   loaf: SourdoughLoaf;
   loafNumber: number;
   onUpdate: (updates: Partial<SourdoughLoaf>) => void;
   onDelete: () => void;
   calculateHydration: (water: number | null, flour: number | null) => number | null;
-  fetchGilbertTemperature: () => Promise<number | null>;
 }) {
   const hydration = calculateHydration(loaf.waterGrams, loaf.flourGrams);
 
@@ -352,20 +351,6 @@ function LoafCard({
   const starterFedDate = loaf.starterFedDate || loafDateStr;
   const isStarterFedPrevDay = starterFedDate !== loafDateStr;
 
-  const setStarterFed = () => {
-    const now = new Date();
-    const time = now.toTimeString().slice(0, 5);
-    const todayStr = now.toISOString().split("T")[0];
-    onUpdate({
-      starterFedTime: time,
-      starterFedDate: todayStr !== loafDateStr ? todayStr : null,
-    });
-  };
-
-  const clearStarterFed = () => {
-    onUpdate({ starterFedTime: null, starterFedDate: null });
-  };
-
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-5 shadow-sm">
       {/* Header Row */}
@@ -389,6 +374,15 @@ function LoafCard({
                 {isStarterFedPrevDay && (
                   <span className="text-gray-400 text-xs ml-1">(prev day)</span>
                 )}
+                {loaf.temperature && (
+                  <span className="ml-2">• {loaf.temperature}°F outside</span>
+                )}
+                <span className="ml-2">•</span>
+                <TempInput
+                  value={loaf.indoorTempMix}
+                  onUpdate={(temp) => onUpdate({ indoorTempMix: temp })}
+                  placeholder="Indoor"
+                />
               </>
             ) : (
               <span className="text-gray-400">No starter fed time recorded</span>
@@ -410,35 +404,24 @@ function LoafCard({
         <div className="text-gray-700 text-sm font-medium mb-2">Mix</div>
         <div className="flex items-center gap-3 flex-wrap">
           {loaf.initialMixTime ? (
-            <>
-              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                <EditableTime
-                  time={loaf.initialMixTime}
-                  onUpdate={(time) => onUpdate({ initialMixTime: time })}
-                />
-                <button
-                  onClick={() => onUpdate({ initialMixTime: null, temperature: null, indoorTempMix: null })}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </span>
-              {loaf.temperature && (
-                <span className="text-gray-500 text-sm">{loaf.temperature}°F outside</span>
-              )}
-              <TempInput
-                value={loaf.indoorTempMix}
-                onUpdate={(temp) => onUpdate({ indoorTempMix: temp })}
-                placeholder="Indoor"
+            <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+              <EditableTime
+                time={loaf.initialMixTime}
+                onUpdate={(time) => onUpdate({ initialMixTime: time })}
               />
-            </>
+              <button
+                onClick={() => onUpdate({ initialMixTime: null })}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            </span>
           ) : (
             <button
-              onClick={async () => {
+              onClick={() => {
                 const now = new Date();
                 const time = now.toTimeString().slice(0, 5);
-                const temperature = await fetchGilbertTemperature();
-                onUpdate({ initialMixTime: time, temperature });
+                onUpdate({ initialMixTime: time });
               }}
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
             >
