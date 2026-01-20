@@ -355,6 +355,15 @@ export default function SourdoughPage() {
                       const bakeStart = bakeEvent?.time;
                       const bakeDate = bakeEvent?.date || loafDateStr;
 
+                      // Calculate time from mix to first proof
+                      const mixToFirstProof =
+                        loaf.initialMixTime && loaf.firstProofTime
+                          ? getMinutesBetween(
+                              loaf.initialMixTime,
+                              loaf.firstProofTime,
+                            )
+                          : null;
+
                       // Calculate first proof duration (to second proof or bake start)
                       const firstProofEnd = loaf.secondProofTime || bakeStart;
                       const firstProofEndDate = loaf.secondProofTime
@@ -392,6 +401,7 @@ export default function SourdoughPage() {
                             {loaf.firstProofTime && (
                               <div className="flex items-center gap-2">
                                 <span className="text-slate-500">1st:</span>
+
                                 <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md">
                                   {formatTime(loaf.firstProofTime)}
                                   {loaf.firstProofLocation && (
@@ -411,6 +421,11 @@ export default function SourdoughPage() {
                                       </span>
                                     )}
                                 </span>
+                                {mixToFirstProof && mixToFirstProof > 0 && (
+                                  <span className="text-slate-400 text-xs">
+                                    +{formatDuration(mixToFirstProof)} from mix
+                                  </span>
+                                )}
                               </div>
                             )}
                             {loaf.secondProofTime && (
