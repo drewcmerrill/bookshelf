@@ -25,7 +25,7 @@ export function Shelf({ books }: { books: Book[] }) {
   // Example calculation: make angles proportional to screen width
   const angle1 =
     (Math.atan(
-      (screenWidth / 2 - shelfThickness) / (shelfHeight / 2 - shelfThickness)
+      (screenWidth / 2 - shelfThickness) / (shelfHeight / 2 - shelfThickness),
     ) *
       180) /
     Math.PI;
@@ -42,7 +42,7 @@ export function Shelf({ books }: { books: Book[] }) {
 
   const angle4 =
     (Math.atan(
-      (shelfHeight / 2 - shelfThickness) / (screenWidth / 2 - shelfThickness)
+      (shelfHeight / 2 - shelfThickness) / (screenWidth / 2 - shelfThickness),
     ) *
       180) /
       Math.PI +
@@ -50,7 +50,7 @@ export function Shelf({ books }: { books: Book[] }) {
 
   const totalDepth = Math.sqrt(
     (shelfHeight / 2) * (shelfHeight / 2) +
-      (screenWidth / 2) * (screenWidth / 2)
+      (screenWidth / 2) * (screenWidth / 2),
   );
 
   const shelfDepth = totalDepth / 5;
@@ -63,7 +63,7 @@ export function Shelf({ books }: { books: Book[] }) {
   const verticalOffset = shelfHeight / 2 - b;
   const horizontalOffset = screenWidth / 2 - a;
   const c = Math.sqrt(
-    (totalDepth - shelfDepth) * (totalDepth - shelfDepth) - a * a
+    (totalDepth - shelfDepth) * (totalDepth - shelfDepth) - a * a,
   );
   const d = Math.tan(radians2) * a;
 
@@ -228,8 +228,18 @@ export function Shelf({ books }: { books: Book[] }) {
               onClick={() => setSelectedBook(null)}
               className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full bg-[#3d2e1f] hover:bg-[#2a1f14] text-white shadow-md hover:shadow-lg transition-all z-10"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
@@ -242,7 +252,8 @@ export function Shelf({ books }: { books: Book[] }) {
                   <div
                     className="relative"
                     style={{
-                      boxShadow: "4px 4px 15px rgba(0,0,0,0.3), -1px -1px 5px rgba(0,0,0,0.1)",
+                      boxShadow:
+                        "4px 4px 15px rgba(0,0,0,0.3), -1px -1px 5px rgba(0,0,0,0.1)",
                     }}
                   >
                     <img
@@ -283,9 +294,9 @@ export function Shelf({ books }: { books: Book[] }) {
                   {selectedBook.ratingOverall && (
                     <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1">
                       {RATING_FACTORS.map((factor) => {
-                        const value = selectedBook[
-                          factor.key as keyof Book
-                        ] as number | undefined;
+                        const value = selectedBook[factor.key as keyof Book] as
+                          | number
+                          | undefined;
                         if (!value) return null;
                         return (
                           <div
@@ -301,7 +312,7 @@ export function Shelf({ books }: { books: Book[] }) {
                                   key={star}
                                   className={`w-3 h-3 ${
                                     star <= value
-                                      ? "text-yellow-500 fill-yellow-500"
+                                      ? "text-[#c4a77d] fill-[#c4a77d]"
                                       : "text-[#d4c4b0]"
                                   }`}
                                   viewBox="0 0 24 24"
@@ -330,8 +341,8 @@ export function Shelf({ books }: { books: Book[] }) {
                           selectedBook.read === "Read"
                             ? "bg-[#2d5a27]/15 text-[#2d5a27]"
                             : selectedBook.read === "Reading"
-                            ? "bg-[#8b5a2b]/15 text-[#8b5a2b]"
-                            : "bg-[#6b5a4a]/15 text-[#6b5a4a]"
+                              ? "bg-[#8b5a2b]/15 text-[#8b5a2b]"
+                              : "bg-[#6b5a4a]/15 text-[#6b5a4a]"
                         }`}
                       >
                         {selectedBook.read}
@@ -379,7 +390,7 @@ export function Shelf({ books }: { books: Book[] }) {
             </div>
 
             {/* Footer */}
-            <div className="h-1.5 bg-linear-to-r from-[#A07A55] via-[#c4a77d] to-[#A07A55]" />
+            <div className="h-1.5 bg-linear-to-r from-[#9c8468] via-[#c4a77d] to-[#9c8468]" />
           </div>
         </div>
       )}

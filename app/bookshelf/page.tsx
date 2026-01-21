@@ -3,9 +3,9 @@ import { Stats } from "@/components/Stats";
 import { prisma } from "@/lib/prisma";
 import { Book } from "@/data/types";
 import Link from "next/link";
-import { IM_Fell_Great_Primer_SC } from "next/font/google";
+import { Cinzel } from "next/font/google";
 
-const FellGreatPrimer = IM_Fell_Great_Primer_SC({
+const cinzel = Cinzel({
   weight: "400",
   subsets: ["latin"],
 });
@@ -42,14 +42,16 @@ export default async function BookshelfPage() {
   }));
 
   return (
-    <div
-      className="min-h-screen bg-slate-50 flex flex-col bg-cover bg-center bg-no-repeat gap-0  "
-      style={{ backgroundImage: "url('/paper-texture.jpg')" }}
-    >
-      <header className="relative bg-white border-b border-slate-200 px-8 py-8 flex items-center mb-5">
+    <div className="min-h-screen flex flex-col gap-0 relative">
+      {/* Fixed background layer */}
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
+        style={{ backgroundImage: "url('/paper-texture.jpg')" }}
+      />
+      <header className="relative px-8 py-8 flex items-center mb-5">
         <Link
           href="/"
-          className={`${FellGreatPrimer.className} text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2`}
+          className={`${cinzel.className} text-[#6b5a4a] hover:text-[#3d2e1f] transition-colors flex items-center gap-2`}
         >
           <svg
             className="w-5 h-5"
@@ -68,14 +70,14 @@ export default async function BookshelfPage() {
         </Link>
 
         <h1
-          className={`${FellGreatPrimer.className} text-3xl md:text-5xl text-slate-900 absolute left-1/2 -translate-x-1/2`}
+          className={`${cinzel.className} text-2xl md:text-5xl text-[#3d2e1f] absolute left-1/2 -translate-x-1/2`}
         >
           My Bookshelf
         </h1>
 
         <Link
           href="/admin"
-          className={`${FellGreatPrimer.className} ml-auto text-slate-400 hover:text-slate-600 transition-colors `}
+          className={`${cinzel.className} ml-auto text-[#6b5a4a] hover:text-[#3d2e1f] transition-colors`}
         >
           Edit
         </Link>

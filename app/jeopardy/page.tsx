@@ -72,13 +72,13 @@ export default function JeopardyPage() {
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           {loading ? (
-            <div className="bg-[#060ce9] border-4 border-black shadow-2xl rounded-lg p-8">
+            <div className="bg-[#060ce9] border-2 border-black shadow-2xl rounded-lg p-8">
               <div className="flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
               </div>
             </div>
           ) : error ? (
-            <div className="bg-[#060ce9] border-4 border-black shadow-2xl rounded-lg p-8 text-center">
+            <div className="bg-[#060ce9] border-2 border-black shadow-2xl rounded-lg p-8 text-center">
               <p className="text-white text-xl mb-4">{error}</p>
               <button
                 onClick={fetchClue}
@@ -97,7 +97,7 @@ export default function JeopardyPage() {
               </div>
 
               {/* Clue Card */}
-              <div className="bg-[#060ce9] border-4 border-yellow-400 shadow-2xl rounded-lg p-8 min-h-[200px] flex items-center justify-center">
+              <div className="bg-[#060ce9] border-2 border-yellow-400 shadow-2xl rounded-lg p-8 min-h-[200px] flex items-center justify-center">
                 <p
                   className="text-white text-xl sm:text-2xl text-center leading-relaxed uppercase"
                   style={{

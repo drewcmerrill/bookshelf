@@ -128,10 +128,12 @@ export default function SourdoughPage() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-slate-50 flex flex-col bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/paper-texture.jpg')" }}
-    >
+    <div className="min-h-screen flex flex-col relative">
+      {/* Fixed repeating background layer */}
+      <div
+        className="fixed inset-0 bg-repeat -z-10"
+        style={{ backgroundImage: "url('/paper-texture.jpg')" }}
+      />
       {/* Header */}
       <header
         className={`${tangerine.className} bg-white border-b border-slate-200 px-8 py-8 flex justify-between items-center`}
@@ -516,7 +518,7 @@ export default function SourdoughPage() {
                               </span>
                             )}
                           </span>
-                          <div className="flex flex-col gap-2 mt-1">
+                          <div className="flex flex-col items-start gap-2 mt-1">
                             {events.map((event, idx) => {
                               const currentDate = getEventDate(event);
                               const nextEvent =

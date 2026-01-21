@@ -24,10 +24,10 @@ export default function Home() {
         <nav className="mb-12">
           <ul className="space-y-2 text-2xl md:text-2xl">
             {[
-              { href: "/bookshelf", label: "Bookshelf", numeral: "I" },
-              { href: "/sourdough", label: "Sourdough Log", numeral: "II" },
-              { href: "/jeopardy", label: "Jeopardy", numeral: "III" },
-              { href: "/krypto", label: "Krypto", numeral: "IV" },
+              { href: "/bookshelf", label: "Bookshelf", numeral: "I." },
+              { href: "/sourdough", label: "Sourdough Log", numeral: "II." },
+              { href: "/jeopardy", label: "Jeopardy", numeral: "III." },
+              // { href: "/krypto", label: "Krypto", numeral: "IV." },
             ].map((item) => (
               <li key={item.href}>
                 <Link

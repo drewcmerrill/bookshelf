@@ -1,8 +1,8 @@
 "use client";
 import { Book } from "@/data/types";
-import { IM_Fell_Great_Primer_SC } from "next/font/google";
+import { Cinzel } from "next/font/google";
 
-const FellGreatPrimer = IM_Fell_Great_Primer_SC({
+const cinzel = Cinzel({
   weight: "400",
   subsets: ["latin"],
 });
@@ -39,7 +39,8 @@ export function Stats({ books }: StatsProps) {
   return (
     <div className="w-full flex justify-center mb-6">
       <div
-        className={` ${FellGreatPrimer.className} max-w-4xl w-full mx-4 overflow-hidden bg-white border border-slate-200 rounded-lg p-4 space-y-4 shadow-sm`}
+        className={`${cinzel.className} max-w-4xl w-full mx-4 overflow-hidden bg-[#f5ebe0]/80 border border-[#c4a77d]/30 rounded-sm p-4 space-y-4`}
+        style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}
       >
         {/* Header */}
         {/* <div className="relative px-6 pt-6 pb-4">
@@ -71,41 +72,41 @@ export function Stats({ books }: StatsProps) {
         <div className="px-6 py-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Books Read */}
-            <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-slate-900">
+            <div className="text-center p-3 rounded-sm bg-[#f5ebe0]/60">
+              <div className="text-3xl font-bold text-[#3d2e1f]">
                 {totalReadBooks}
               </div>
-              <div className="text-xs text-[#0f172b] uppercase tracking-wider mt-1">
+              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">
                 Books Read
               </div>
             </div>
 
             {/* To Read */}
-            <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-slate-900">
+            <div className="text-center p-3 rounded-sm bg-[#f5ebe0]/60">
+              <div className="text-3xl font-bold text-[#3d2e1f]">
                 {totalUnreadBooks}
               </div>
-              <div className="text-xs text-slate-900 uppercase tracking-wider mt-1">
+              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">
                 To Read
               </div>
             </div>
 
             {/* Pages Read */}
-            <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-slate-900">
+            <div className="text-center p-3 rounded-sm bg-[#f5ebe0]/60">
+              <div className="text-3xl font-bold text-[#3d2e1f]">
                 {totalReadPages.toLocaleString()}
               </div>
-              <div className="text-xs text-slate-900 uppercase tracking-wider mt-1">
+              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">
                 Pages Read
               </div>
             </div>
 
             {/* Avg Pages */}
-            <div className="text-center p-3 rounded-lg bg-white/40">
-              <div className="text-3xl font-bold text-slate-900">
+            <div className="text-center p-3 rounded-sm bg-[#f5ebe0]/60">
+              <div className="text-3xl font-bold text-[#3d2e1f]">
                 {averagePages}
               </div>
-              <div className="text-xs text-slate-900 uppercase tracking-wider mt-1">
+              <div className="text-xs text-[#6b5a4a] uppercase tracking-wider mt-1">
                 Avg Pages
               </div>
             </div>
@@ -114,14 +115,14 @@ export function Stats({ books }: StatsProps) {
           {/* Average Rating (if available) */}
           {averageRating && (
             <div className="mt-4 flex items-center justify-center gap-2">
-              <span className="text-sm text-slate-900">Average Rating:</span>
+              <span className="text-sm text-[#6b5a4a]">Average Rating:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <svg
                     key={star}
                     className={`w-4 h-4 ${
                       star <= Math.round(parseFloat(averageRating))
-                        ? "text-yellow-500 fill-yellow-500"
+                        ? "text-[#c4a77d] fill-[#c4a77d]"
                         : "text-[#d4c4b0]"
                     }`}
                     viewBox="0 0 24 24"
@@ -135,7 +136,7 @@ export function Stats({ books }: StatsProps) {
                     />
                   </svg>
                 ))}
-                <span className="text-sm font-medium text-slate-900 ml-1">
+                <span className="text-sm font-medium text-[#3d2e1f] ml-1">
                   {averageRating}
                 </span>
               </div>
