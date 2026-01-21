@@ -145,7 +145,7 @@ export default function AdminSourdoughPage() {
     try {
       // Gilbert, AZ coordinates: 33.3528° N, 111.7890° W
       const res = await fetch(
-        "https://api.open-meteo.com/v1/forecast?latitude=33.3528&longitude=-111.789&current=temperature_2m&temperature_unit=fahrenheit"
+        "https://api.open-meteo.com/v1/forecast?latitude=33.3528&longitude=-111.789&current=temperature_2m&temperature_unit=fahrenheit",
       );
       if (res.ok) {
         const data = await res.json();
@@ -230,9 +230,24 @@ export default function AdminSourdoughPage() {
           href="/sourdough"
           className="text-gray-500 hover:text-gray-700 transition-colors text-sm flex items-center gap-1"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
           </svg>
           View Public Page
         </Link>
@@ -244,8 +259,18 @@ export default function AdminSourdoughPage() {
         disabled={saving}
         className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
         </svg>
         Feed Starter
       </button>
@@ -288,7 +313,10 @@ function LoafCard({
   loafNumber: number;
   onUpdate: (updates: Partial<SourdoughLoaf>) => void;
   onDelete: () => void;
-  calculateHydration: (water: number | null, flour: number | null) => number | null;
+  calculateHydration: (
+    water: number | null,
+    flour: number | null,
+  ) => number | null;
 }) {
   const hydration = calculateHydration(loaf.waterGrams, loaf.flourGrams);
 
@@ -299,13 +327,15 @@ function LoafCard({
     onUpdate({ stretchFolds: folds });
   };
 
-  const updateStretchFold = (index: number, updates: Partial<StretchFoldObject>) => {
+  const updateStretchFold = (
+    index: number,
+    updates: Partial<StretchFoldObject>,
+  ) => {
     const folds = [...(loaf.stretchFolds || [])];
     const currentFold = folds[index];
     // Convert old string format to object format if needed
-    const currentObj: StretchFoldObject = typeof currentFold === "string"
-      ? { time: currentFold }
-      : currentFold;
+    const currentObj: StretchFoldObject =
+      typeof currentFold === "string" ? { time: currentFold } : currentFold;
     folds[index] = { ...currentObj, ...updates };
     onUpdate({ stretchFolds: folds });
   };
@@ -318,7 +348,7 @@ function LoafCard({
   const setProofTime = (
     timeField: "firstProofTime" | "secondProofTime",
     locationField: "firstProofLocation" | "secondProofLocation",
-    location: string
+    location: string,
   ) => {
     const now = new Date();
     const time = now.toTimeString().slice(0, 5);
@@ -327,7 +357,7 @@ function LoafCard({
 
   const clearProof = (
     timeField: "firstProofTime" | "secondProofTime",
-    locationField: "firstProofLocation" | "secondProofLocation"
+    locationField: "firstProofLocation" | "secondProofLocation",
   ) => {
     onUpdate({ [timeField]: null, [locationField]: null });
   };
@@ -335,7 +365,13 @@ function LoafCard({
   const addBakeEvent = () => {
     const now = new Date();
     const time = now.toTimeString().slice(0, 5);
-    const events = [...(loaf.bakeEvents || []), { time, temp: 450 }];
+    const todayStr = now.toISOString().split("T")[0];
+    const loafDateStr = new Date(loaf.date).toISOString().split("T")[0];
+    const newEvent: BakeEvent = { time, temp: 500 };
+    if (todayStr !== loafDateStr) {
+      newEvent.date = todayStr;
+    }
+    const events = [...(loaf.bakeEvents || []), newEvent];
     onUpdate({ bakeEvents: events });
   };
 
@@ -360,7 +396,8 @@ function LoafCard({
       <div className="flex justify-between items-start">
         <div>
           <div className="text-gray-900 font-semibold text-lg">
-            Loaf {loafNumber} — {new Date(loaf.date).toLocaleDateString("en-US", {
+            Loaf {loafNumber} —{" "}
+            {new Date(loaf.date).toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",
               day: "numeric",
@@ -388,7 +425,9 @@ function LoafCard({
                 />
               </>
             ) : (
-              <span className="text-gray-400">No starter fed time recorded</span>
+              <span className="text-gray-400">
+                No starter fed time recorded
+              </span>
             )}
           </div>
         </div>
@@ -396,8 +435,18 @@ function LoafCard({
           onClick={onDelete}
           className="text-gray-300 hover:text-red-500 transition-colors p-1"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
           </svg>
         </button>
       </div>
@@ -414,7 +463,9 @@ function LoafCard({
                   onUpdate={(time) => onUpdate({ initialMixTime: time })}
                 />
                 <button
-                  onClick={() => onUpdate({ initialMixTime: null, mixIndoorTemp: null })}
+                  onClick={() =>
+                    onUpdate({ initialMixTime: null, mixIndoorTemp: null })
+                  }
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
@@ -475,13 +526,25 @@ function LoafCard({
       {/* Stretch & Folds */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-700 text-sm font-medium">Stretch & Folds</span>
+          <span className="text-gray-700 text-sm font-medium">
+            Stretch & Folds
+          </span>
           <button
             onClick={addStretchFold}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add
           </button>
@@ -491,7 +554,8 @@ function LoafCard({
             {loaf.stretchFolds.map((fold, index) => {
               // Handle both old string format and new object format
               const foldTime = typeof fold === "string" ? fold : fold.time;
-              const foldIndoorTemp = typeof fold === "string" ? null : (fold.indoorTemp || null);
+              const foldIndoorTemp =
+                typeof fold === "string" ? null : fold.indoorTemp || null;
               return (
                 <span
                   key={index}
@@ -499,11 +563,17 @@ function LoafCard({
                 >
                   <EditableTime
                     time={foldTime}
-                    onUpdate={(newTime) => updateStretchFold(index, { time: newTime })}
+                    onUpdate={(newTime) =>
+                      updateStretchFold(index, { time: newTime })
+                    }
                   />
                   <TempInput
                     value={foldIndoorTemp}
-                    onUpdate={(temp) => updateStretchFold(index, { indoorTemp: temp || undefined })}
+                    onUpdate={(temp) =>
+                      updateStretchFold(index, {
+                        indoorTemp: temp || undefined,
+                      })
+                    }
                     placeholder="Temp"
                     compact
                   />
@@ -538,7 +608,9 @@ function LoafCard({
                   {loaf.firstProofLocation && (
                     <select
                       value={loaf.firstProofLocation}
-                      onChange={(e) => onUpdate({ firstProofLocation: e.target.value })}
+                      onChange={(e) =>
+                        onUpdate({ firstProofLocation: e.target.value })
+                      }
                       className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
                     >
                       {PROOF_LOCATIONS.map((loc) => (
@@ -549,7 +621,9 @@ function LoafCard({
                     </select>
                   )}
                   <button
-                    onClick={() => clearProof("firstProofTime", "firstProofLocation")}
+                    onClick={() =>
+                      clearProof("firstProofTime", "firstProofLocation")
+                    }
                     className="text-gray-400 hover:text-gray-600"
                   >
                     ×
@@ -566,7 +640,13 @@ function LoafCard({
                 {PROOF_LOCATIONS.map((loc) => (
                   <button
                     key={loc.value}
-                    onClick={() => setProofTime("firstProofTime", "firstProofLocation", loc.value)}
+                    onClick={() =>
+                      setProofTime(
+                        "firstProofTime",
+                        "firstProofLocation",
+                        loc.value,
+                      )
+                    }
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
                   >
                     {loc.label}
@@ -587,7 +667,9 @@ function LoafCard({
                   {loaf.secondProofLocation && (
                     <select
                       value={loaf.secondProofLocation}
-                      onChange={(e) => onUpdate({ secondProofLocation: e.target.value })}
+                      onChange={(e) =>
+                        onUpdate({ secondProofLocation: e.target.value })
+                      }
                       className="bg-transparent text-gray-500 text-sm border-none focus:outline-none cursor-pointer"
                     >
                       {PROOF_LOCATIONS.map((loc) => (
@@ -598,7 +680,9 @@ function LoafCard({
                     </select>
                   )}
                   <button
-                    onClick={() => clearProof("secondProofTime", "secondProofLocation")}
+                    onClick={() =>
+                      clearProof("secondProofTime", "secondProofLocation")
+                    }
                     className="text-gray-400 hover:text-gray-600"
                   >
                     ×
@@ -615,7 +699,13 @@ function LoafCard({
                 {PROOF_LOCATIONS.map((loc) => (
                   <button
                     key={loc.value}
-                    onClick={() => setProofTime("secondProofTime", "secondProofLocation", loc.value)}
+                    onClick={() =>
+                      setProofTime(
+                        "secondProofTime",
+                        "secondProofLocation",
+                        loc.value,
+                      )
+                    }
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
                   >
                     {loc.label}
@@ -635,8 +725,18 @@ function LoafCard({
             onClick={addBakeEvent}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add
           </button>
@@ -647,7 +747,12 @@ function LoafCard({
             {DUTCH_OVEN_OPTIONS.map((option) => (
               <button
                 key={option.value}
-                onClick={() => onUpdate({ dutchOven: loaf.dutchOven === option.value ? null : option.value })}
+                onClick={() =>
+                  onUpdate({
+                    dutchOven:
+                      loaf.dutchOven === option.value ? null : option.value,
+                  })
+                }
                 className={`text-sm px-3 py-1.5 rounded-lg transition-colors ${
                   loaf.dutchOven === option.value
                     ? "bg-gray-900 text-white"
@@ -672,10 +777,7 @@ function LoafCard({
               />
             ))}
             {/* Remove from Oven */}
-            <BakeEndRow
-              loaf={loaf}
-              onUpdate={onUpdate}
-            />
+            <BakeEndRow loaf={loaf} onUpdate={onUpdate} />
           </div>
         ) : (
           <div className="text-gray-400 text-sm">Not started</div>
@@ -684,7 +786,9 @@ function LoafCard({
 
       {/* Cross Section */}
       <div>
-        <div className="text-gray-700 text-sm font-medium mb-2">Cross Section</div>
+        <div className="text-gray-700 text-sm font-medium mb-2">
+          Cross Section
+        </div>
         <div className="flex items-center gap-3">
           <CrossSectionInput
             label="Width"
@@ -708,10 +812,7 @@ function LoafCard({
       />
 
       {/* Notes */}
-      <NotesInput
-        value={loaf.notes}
-        onSave={(notes) => onUpdate({ notes })}
-      />
+      <NotesInput value={loaf.notes} onSave={(notes) => onUpdate({ notes })} />
     </div>
   );
 }
@@ -748,8 +849,18 @@ function BakeEndRow({
             className="text-gray-400 hover:text-gray-600 text-xs"
             title="Change date"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
           </button>
           {showDatePicker && (
@@ -757,7 +868,10 @@ function BakeEndRow({
               type="date"
               value={endDate}
               onChange={(e) => {
-                onUpdate({ bakeEndDate: e.target.value === loafDateStr ? null : e.target.value });
+                onUpdate({
+                  bakeEndDate:
+                    e.target.value === loafDateStr ? null : e.target.value,
+                });
                 setShowDatePicker(false);
               }}
               className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -778,7 +892,7 @@ function BakeEndRow({
             const todayStr = now.toISOString().split("T")[0];
             onUpdate({
               bakeEndTime: time,
-              bakeEndDate: todayStr !== loafDateStr ? todayStr : null
+              bakeEndDate: todayStr !== loafDateStr ? todayStr : null,
             });
           }}
           className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors"
@@ -817,23 +931,33 @@ function BakeEventRow({
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <span className="text-gray-500 text-sm w-8">{index === 0 ? "In" : `${index + 1}.`}</span>
+      <span className="text-gray-500 text-sm w-8">
+        {index === 0 ? "In" : `${index + 1}.`}
+      </span>
       <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1">
         <EditableTime
           time={event.time}
           onUpdate={(time) => onUpdate({ time })}
         />
-        {isNextDay && (
-          <span className="text-gray-400 text-xs">(+1 day)</span>
-        )}
+        {isNextDay && <span className="text-gray-400 text-xs">(+1 day)</span>}
       </span>
       <button
         onClick={() => setShowDatePicker(!showDatePicker)}
         className="text-gray-400 hover:text-gray-600 text-xs"
         title="Change date"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
         </svg>
       </button>
       {showDatePicker && (
@@ -841,7 +965,9 @@ function BakeEventRow({
           type="date"
           value={eventDate}
           onChange={(e) => {
-            onUpdate({ date: e.target.value === loafDateStr ? undefined : e.target.value });
+            onUpdate({
+              date: e.target.value === loafDateStr ? undefined : e.target.value,
+            });
             setShowDatePicker(false);
           }}
           className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -964,7 +1090,8 @@ function TempInput({
   compact?: boolean;
 }) {
   // Treat 0 as empty since 0°F indoor temp isn't realistic
-  const valueToString = (v: number | null) => (v && v !== 0) ? v.toString() : "";
+  const valueToString = (v: number | null) =>
+    v && v !== 0 ? v.toString() : "";
   const [localValue, setLocalValue] = useState(valueToString(value));
 
   useEffect(() => {
@@ -1026,7 +1153,9 @@ function NotesInput({
 
   return (
     <div>
-      <label className="text-gray-700 text-sm font-medium block mb-2">Notes</label>
+      <label className="text-gray-700 text-sm font-medium block mb-2">
+        Notes
+      </label>
       <textarea
         value={localValue}
         onChange={(e) => handleChange(e.target.value)}
@@ -1117,8 +1246,18 @@ function ImageUpload({
             <div className="w-6 h-6 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin" />
           ) : (
             <>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               <span className="text-xs">Add Photo</span>
             </>
