@@ -185,7 +185,128 @@ export default function SourdoughPage() {
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-4 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+            <div className="relative">
+              {/* Steam lines */}
+              <svg
+                className="absolute -top-5 left-1/2 -translate-x-1/2"
+                width="36"
+                height="20"
+                viewBox="0 0 36 20"
+              >
+                <path
+                  d="M8 20 Q6 15, 8 10 Q10 5, 8 0"
+                  fill="none"
+                  stroke="#64748B"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className="animate-steam-1"
+                />
+                <path
+                  d="M18 20 Q16 15, 18 10 Q20 5, 18 0"
+                  fill="none"
+                  stroke="#64748B"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className="animate-steam-2"
+                />
+                <path
+                  d="M28 20 Q26 15, 28 10 Q30 5, 28 0"
+                  fill="none"
+                  stroke="#64748B"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className="animate-steam-3"
+                />
+              </svg>
+              {/* Line-art bread loaf */}
+              <svg width="64" height="32" viewBox="0 0 64 32">
+                {/* Loaf outline - nice rounded boule shape */}
+                <path
+                  d="M6 28 C6 28, 4 20, 12 14 C20 8, 32 6, 32 6 C32 6, 44 8, 52 14 C60 20, 58 28, 58 28"
+                  fill="none"
+                  stroke="#334155"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {/* Base line */}
+                <line
+                  x1="6"
+                  y1="28"
+                  x2="58"
+                  y2="28"
+                  stroke="#334155"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                {/* Score marks - diagonal slashes */}
+                <path
+                  d="M22 11 C24 14, 26 18, 24 22"
+                  fill="none"
+                  stroke="#334155"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M30 9 C32 12, 34 16, 32 20"
+                  fill="none"
+                  stroke="#334155"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M38 10 C40 13, 42 17, 40 21"
+                  fill="none"
+                  stroke="#334155"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            <style jsx>{`
+              @keyframes steam-rise-1 {
+                0%,
+                100% {
+                  opacity: 0;
+                  transform: translateY(0);
+                }
+                50% {
+                  opacity: 0.7;
+                  transform: translateY(-4px);
+                }
+              }
+              @keyframes steam-rise-2 {
+                0%,
+                100% {
+                  opacity: 0;
+                  transform: translateY(0);
+                }
+                50% {
+                  opacity: 0.8;
+                  transform: translateY(-6px);
+                }
+              }
+              @keyframes steam-rise-3 {
+                0%,
+                100% {
+                  opacity: 0;
+                  transform: translateY(0);
+                }
+                50% {
+                  opacity: 0.6;
+                  transform: translateY(-3px);
+                }
+              }
+              .animate-steam-1 {
+                animation: steam-rise-1 2s ease-in-out infinite;
+              }
+              .animate-steam-2 {
+                animation: steam-rise-2 2s ease-in-out infinite 0.3s;
+              }
+              .animate-steam-3 {
+                animation: steam-rise-3 2s ease-in-out infinite 0.6s;
+              }
+            `}</style>
           </div>
         ) : loaves.length === 0 ? (
           <div className="text-center py-12">
