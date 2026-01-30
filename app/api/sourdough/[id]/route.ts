@@ -3,6 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
 
+type IngredientInput = {
+  id?: number;
+  name: string;
+  grams: number;
+  details?: string | null;
+  proteinContent?: number | null;
+  sortOrder?: number;
+};
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -11,6 +20,11 @@ export async function GET(
     const { id } = await params;
     const loaf = await prisma.sourdoughLoaf.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        ingredients: {
+          orderBy: { sortOrder: "asc" },
+        },
+      },
     });
 
     if (!loaf) {
@@ -33,19 +47,20 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+    const loafId = parseInt(id);
     const body = await request.json();
 
     // If updating imageUrls, delete any removed images from blob storage
     if (body.imageUrls !== undefined) {
       const existingLoaf = await prisma.sourdoughLoaf.findUnique({
-        where: { id: parseInt(id) },
+        where: { id: loafId },
         select: { imageUrls: true },
       });
       const oldUrls = (existingLoaf?.imageUrls as string[] | null) || [];
       const newUrls = (body.imageUrls as string[]) || [];
 
       // Find URLs that were removed
-      const removedUrls = oldUrls.filter(url => !newUrls.includes(url));
+      const removedUrls = oldUrls.filter((url) => !newUrls.includes(url));
       for (const url of removedUrls) {
         if (url.includes("blob.vercel-storage.com")) {
           try {
@@ -57,8 +72,61 @@ export async function PUT(
       }
     }
 
+    // Handle ingredients update if provided
+    if (body.ingredients !== undefined) {
+      const newIngredients = body.ingredients as IngredientInput[];
+
+      // Get existing ingredient IDs
+      const existingIngredients = await prisma.sourdoughIngredient.findMany({
+        where: { loafId },
+        select: { id: true },
+      });
+      const existingIds = existingIngredients.map((i) => i.id);
+
+      // Determine which ingredients to update, create, or delete
+      const newIds = newIngredients.filter((i) => i.id).map((i) => i.id!);
+      const idsToDelete = existingIds.filter((id) => !newIds.includes(id));
+
+      // Delete removed ingredients
+      if (idsToDelete.length > 0) {
+        await prisma.sourdoughIngredient.deleteMany({
+          where: { id: { in: idsToDelete } },
+        });
+      }
+
+      // Update or create ingredients
+      for (let i = 0; i < newIngredients.length; i++) {
+        const ing = newIngredients[i];
+        if (ing.id && existingIds.includes(ing.id)) {
+          // Update existing
+          await prisma.sourdoughIngredient.update({
+            where: { id: ing.id },
+            data: {
+              name: ing.name,
+              grams: ing.grams,
+              details: ing.details || null,
+              proteinContent: ing.proteinContent || null,
+              sortOrder: ing.sortOrder ?? i,
+            },
+          });
+        } else {
+          // Create new
+          await prisma.sourdoughIngredient.create({
+            data: {
+              loafId,
+              name: ing.name,
+              grams: ing.grams,
+              details: ing.details || null,
+              proteinContent: ing.proteinContent || null,
+              sortOrder: ing.sortOrder ?? i,
+            },
+          });
+        }
+      }
+    }
+
     const loaf = await prisma.sourdoughLoaf.update({
-      where: { id: parseInt(id) },
+      where: { id: loafId },
       data: {
         date: body.date ? new Date(body.date) : undefined,
         starterFedTime: body.starterFedTime,
@@ -86,6 +154,11 @@ export async function PUT(
         crossSectionWidth: body.crossSectionWidth,
         crossSectionHeight: body.crossSectionHeight,
         notes: body.notes,
+      },
+      include: {
+        ingredients: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
     });
 

@@ -64,10 +64,13 @@ model SourdoughLoaf {
   temperature     Int?     // Outside temperature in °F at time of starter feed
   indoorTempMix   Int?     // Indoor temperature in °F at time of starter feed
   imageUrls       Json?    // Array of Vercel Blob URLs for loaf photos
+  // Legacy ingredient fields - kept for backwards compatibility during migration
   flourGrams      Int?
   flourType       String?  @db.VarChar(255)
   waterGrams      Int?
   starterGrams    Int?
+  // New flexible ingredients relationship
+  ingredients     SourdoughIngredient[]
   stretchFolds    Json?    // Array of {time, indoorTemp?}, e.g., [{"time": "10:00", "indoorTemp": 72}]
   firstProofTime     String?  @db.VarChar(50)  // Time first proof started
   firstProofLocation String?  @db.VarChar(50)  // "oven", "counter", or "fridge"
@@ -86,4 +89,19 @@ model SourdoughLoaf {
   updatedAt       DateTime @updatedAt
 
   @@index([date])
+}
+
+model SourdoughIngredient {
+  id             Int      @id @default(autoincrement())
+  loafId         Int
+  loaf           SourdoughLoaf @relation(fields: [loafId], references: [id], onDelete: Cascade)
+  name           String   @db.VarChar(100)  // "flour", "water", "starter", "salt", or custom
+  grams          Int
+  details        String?  @db.VarChar(255)  // For flour: the type (e.g., "bread flour")
+  proteinContent Float?   // For flour: protein percentage (e.g., 12.5)
+  sortOrder      Int      @default(0)       // To maintain ingredient order
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([loafId])
 }

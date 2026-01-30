@@ -73,6 +73,15 @@ type StretchFold =
     }
   | string; // Support both old string format and new object format
 
+type SourdoughIngredient = {
+  id: number;
+  name: string;
+  grams: number;
+  details: string | null;
+  proteinContent: number | null;
+  sortOrder: number;
+};
+
 type SourdoughLoaf = {
   id: number;
   date: string;
@@ -87,6 +96,7 @@ type SourdoughLoaf = {
   flourType: string | null;
   waterGrams: number | null;
   starterGrams: number | null;
+  ingredients: SourdoughIngredient[];
   stretchFolds: StretchFold[] | null;
   firstProofTime: string | null;
   firstProofLocation: string | null;
@@ -122,7 +132,13 @@ export default function SourdoughPage() {
     fetchLoaves();
   }, []);
 
-  const calculateHydration = (water: number | null, flour: number | null) => {
+  const calculateHydration = (ingredients: SourdoughIngredient[]) => {
+    const flour = ingredients
+      .filter((i) => i.name === "flour")
+      .reduce((sum, i) => sum + i.grams, 0);
+    const water = ingredients
+      .filter((i) => i.name === "water")
+      .reduce((sum, i) => sum + i.grams, 0);
     if (!flour || !water) return null;
     return Math.round((water / flour) * 100);
   };
@@ -315,10 +331,7 @@ export default function SourdoughPage() {
         ) : (
           <div className="space-y-4">
             {loaves.map((loaf, index) => {
-              const hydration = calculateHydration(
-                loaf.waterGrams,
-                loaf.flourGrams,
-              );
+              const hydration = calculateHydration(loaf.ingredients || []);
               const loafNumber = loaves.length - index;
               return (
                 <div
@@ -395,31 +408,35 @@ export default function SourdoughPage() {
                   </div>
 
                   {/* Ingredients */}
-                  <div className="space-y-1 text-sm">
-                    <div className="flex gap-4">
-                      <span className="text-slate-500 w-16">Flour</span>
-                      <span className="text-slate-900">
-                        {loaf.flourGrams || 0}g {loaf.flourType || ""}
-                      </span>
+                  {loaf.ingredients && loaf.ingredients.length > 0 && (
+                    <div className="space-y-1 text-sm">
+                      {loaf.ingredients.map((ing) => {
+                        const displayName =
+                          ing.name.charAt(0).toUpperCase() + ing.name.slice(1);
+                        return (
+                          <div key={ing.id} className="flex gap-4">
+                            <span className="text-slate-500 w-16">
+                              {displayName}
+                            </span>
+                            <span className="text-slate-900">
+                              {ing.grams}g
+                              {ing.details && ` ${ing.details}`}
+                              {ing.proteinContent && (
+                                <span className="text-slate-400 ml-1">
+                                  ({ing.proteinContent}% protein)
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
+                      {hydration !== null && hydration > 0 && (
+                        <div className="text-slate-600 font-medium pt-1">
+                          Hydration: {hydration}%
+                        </div>
+                      )}
                     </div>
-                    <div className="flex gap-4">
-                      <span className="text-slate-500 w-16">Water</span>
-                      <span className="text-slate-900">
-                        {loaf.waterGrams || 0}g
-                      </span>
-                    </div>
-                    <div className="flex gap-4">
-                      <span className="text-slate-500 w-16">Starter</span>
-                      <span className="text-slate-900">
-                        {loaf.starterGrams || 0}g
-                      </span>
-                    </div>
-                    {hydration !== null && hydration > 0 && (
-                      <div className="text-slate-600 font-medium pt-1">
-                        Hydration: {hydration}%
-                      </div>
-                    )}
-                  </div>
+                  )}
 
                   {/* Stretch & Folds */}
                   {loaf.stretchFolds && loaf.stretchFolds.length > 0 && (

@@ -79,6 +79,15 @@ type StretchFoldObject = {
 
 type StretchFold = StretchFoldObject | string; // Support both old string format and new object format
 
+type SourdoughIngredient = {
+  id: number;
+  name: string;
+  grams: number;
+  details: string | null;
+  proteinContent: number | null;
+  sortOrder: number;
+};
+
 type SourdoughLoaf = {
   id: number;
   date: string;
@@ -93,6 +102,7 @@ type SourdoughLoaf = {
   flourType: string | null;
   waterGrams: number | null;
   starterGrams: number | null;
+  ingredients: SourdoughIngredient[];
   stretchFolds: StretchFold[] | null;
   firstProofTime: string | null;
   firstProofLocation: string | null;
@@ -108,6 +118,13 @@ type SourdoughLoaf = {
   crossSectionHeight: number | null;
   notes: string | null;
 };
+
+const COMMON_INGREDIENTS = [
+  { value: "flour", label: "Flour" },
+  { value: "water", label: "Water" },
+  { value: "starter", label: "Starter" },
+  { value: "salt", label: "Salt" },
+];
 
 const PROOF_LOCATIONS = [
   { value: "counter", label: "Counter" },
@@ -209,7 +226,13 @@ export default function AdminSourdoughPage() {
     }
   };
 
-  const calculateHydration = (water: number | null, flour: number | null) => {
+  const calculateHydration = (ingredients: SourdoughIngredient[]) => {
+    const flour = ingredients
+      .filter((i) => i.name === "flour")
+      .reduce((sum, i) => sum + i.grams, 0);
+    const water = ingredients
+      .filter((i) => i.name === "water")
+      .reduce((sum, i) => sum + i.grams, 0);
     if (!flour || !water) return null;
     return Math.round((water / flour) * 100);
   };
@@ -313,12 +336,9 @@ function LoafCard({
   loafNumber: number;
   onUpdate: (updates: Partial<SourdoughLoaf>) => void;
   onDelete: () => void;
-  calculateHydration: (
-    water: number | null,
-    flour: number | null,
-  ) => number | null;
+  calculateHydration: (ingredients: SourdoughIngredient[]) => number | null;
 }) {
-  const hydration = calculateHydration(loaf.waterGrams, loaf.flourGrams);
+  const hydration = calculateHydration(loaf.ingredients || []);
 
   const addStretchFold = () => {
     const now = new Date();
@@ -493,35 +513,13 @@ function LoafCard({
       </div>
 
       {/* Ingredients Section */}
-      <div className="space-y-3">
-        <div className="text-gray-700 text-sm font-medium">Ingredients</div>
-        <IngredientRow
-          label="Flour"
-          value={loaf.flourGrams}
-          unit="g"
-          secondaryValue={loaf.flourType}
-          secondaryPlaceholder="Type"
-          onValueChange={(v) => onUpdate({ flourGrams: v })}
-          onSecondaryChange={(v) => onUpdate({ flourType: v })}
-        />
-        <IngredientRow
-          label="Water"
-          value={loaf.waterGrams}
-          unit="g"
-          onValueChange={(v) => onUpdate({ waterGrams: v })}
-        />
-        <IngredientRow
-          label="Starter"
-          value={loaf.starterGrams}
-          unit="g"
-          onValueChange={(v) => onUpdate({ starterGrams: v })}
-        />
-        {hydration !== null && hydration > 0 && (
-          <div className="text-gray-500 text-sm pl-[76px]">
-            Hydration: {hydration}%
-          </div>
-        )}
-      </div>
+      <IngredientsSection
+        ingredients={loaf.ingredients || []}
+        onUpdate={(ingredients) =>
+          onUpdate({ ingredients } as Partial<SourdoughLoaf>)
+        }
+        hydration={hydration}
+      />
 
       {/* Stretch & Folds */}
       <div>
@@ -992,56 +990,220 @@ function BakeEventRow({
   );
 }
 
-function IngredientRow({
-  label,
-  value,
-  unit,
-  secondaryValue,
-  secondaryPlaceholder,
-  onValueChange,
-  onSecondaryChange,
+function IngredientsSection({
+  ingredients,
+  onUpdate,
+  hydration,
 }: {
-  label: string;
-  value: number | null;
-  unit: string;
-  secondaryValue?: string | null;
-  secondaryPlaceholder?: string;
-  onValueChange: (v: number) => void;
-  onSecondaryChange?: (v: string) => void;
+  ingredients: SourdoughIngredient[];
+  onUpdate: (ingredients: SourdoughIngredient[]) => void;
+  hydration: number | null;
 }) {
-  const [localValue, setLocalValue] = useState(value?.toString() || "");
-  const [localSecondary, setLocalSecondary] = useState(secondaryValue || "");
+  const [showAddDropdown, setShowAddDropdown] = useState(false);
+  const [customIngredient, setCustomIngredient] = useState("");
 
-  useEffect(() => {
-    setLocalValue(value?.toString() || "");
-  }, [value]);
+  const addIngredient = (name: string) => {
+    const newIngredient: SourdoughIngredient = {
+      id: -Date.now(), // Temporary negative ID for new ingredients
+      name,
+      grams: 0,
+      details: null,
+      proteinContent: null,
+      sortOrder: ingredients.length,
+    };
+    onUpdate([...ingredients, newIngredient]);
+    setShowAddDropdown(false);
+    setCustomIngredient("");
+  };
 
-  useEffect(() => {
-    setLocalSecondary(secondaryValue || "");
-  }, [secondaryValue]);
+  const updateIngredient = (
+    index: number,
+    updates: Partial<SourdoughIngredient>
+  ) => {
+    const updated = [...ingredients];
+    updated[index] = { ...updated[index], ...updates };
+    onUpdate(updated);
+  };
+
+  const removeIngredient = (index: number) => {
+    onUpdate(ingredients.filter((_, i) => i !== index));
+  };
+
+  // Get ingredients not yet added (for dropdown)
+  const usedNames = ingredients.map((i) => i.name);
+  const availableIngredients = COMMON_INGREDIENTS.filter(
+    (i) => !usedNames.includes(i.value)
+  );
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-gray-600 text-sm w-16">{label}</span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-gray-700 text-sm font-medium">Ingredients</span>
+        <div className="relative">
+          <button
+            onClick={() => setShowAddDropdown(!showAddDropdown)}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add
+          </button>
+          {showAddDropdown && (
+            <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+              {availableIngredients.map((ing) => (
+                <button
+                  key={ing.value}
+                  onClick={() => addIngredient(ing.value)}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 first:rounded-t-lg"
+                >
+                  {ing.label}
+                </button>
+              ))}
+              <div className="border-t border-gray-200">
+                <div className="p-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={customIngredient}
+                    onChange={(e) => setCustomIngredient(e.target.value)}
+                    placeholder="Custom..."
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && customIngredient.trim()) {
+                        addIngredient(customIngredient.trim().toLowerCase());
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (customIngredient.trim()) {
+                        addIngredient(customIngredient.trim().toLowerCase());
+                      }
+                    }}
+                    disabled={!customIngredient.trim()}
+                    className="bg-gray-900 text-white px-2 py-1 rounded text-sm disabled:bg-gray-300"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {ingredients.length === 0 ? (
+        <div className="text-gray-400 text-sm">No ingredients added</div>
+      ) : (
+        <div className="space-y-2">
+          {ingredients.map((ing, index) => (
+            <IngredientItemRow
+              key={ing.id}
+              ingredient={ing}
+              onUpdate={(updates) => updateIngredient(index, updates)}
+              onRemove={() => removeIngredient(index)}
+            />
+          ))}
+        </div>
+      )}
+
+      {hydration !== null && hydration > 0 && (
+        <div className="text-gray-500 text-sm pt-1">
+          Hydration: {hydration}%
+        </div>
+      )}
+    </div>
+  );
+}
+
+function IngredientItemRow({
+  ingredient,
+  onUpdate,
+  onRemove,
+}: {
+  ingredient: SourdoughIngredient;
+  onUpdate: (updates: Partial<SourdoughIngredient>) => void;
+  onRemove: () => void;
+}) {
+  const [localGrams, setLocalGrams] = useState(ingredient.grams.toString());
+  const [localDetails, setLocalDetails] = useState(ingredient.details || "");
+  const [localProtein, setLocalProtein] = useState(
+    ingredient.proteinContent?.toString() || ""
+  );
+
+  useEffect(() => {
+    setLocalGrams(ingredient.grams.toString());
+  }, [ingredient.grams]);
+
+  useEffect(() => {
+    setLocalDetails(ingredient.details || "");
+  }, [ingredient.details]);
+
+  useEffect(() => {
+    setLocalProtein(ingredient.proteinContent?.toString() || "");
+  }, [ingredient.proteinContent]);
+
+  const isFlour = ingredient.name === "flour";
+  const displayName =
+    COMMON_INGREDIENTS.find((i) => i.value === ingredient.name)?.label ||
+    ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1);
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      <span className="text-gray-600 text-sm w-16">{displayName}</span>
       <input
         type="number"
-        value={localValue}
-        onChange={(e) => setLocalValue(e.target.value)}
-        onBlur={() => onValueChange(parseInt(localValue) || 0)}
-        className="w-24 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        value={localGrams}
+        onChange={(e) => setLocalGrams(e.target.value)}
+        onBlur={() => onUpdate({ grams: parseInt(localGrams) || 0 })}
+        className="w-20 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         placeholder="0"
       />
-      <span className="text-gray-400 text-sm">{unit}</span>
-      {onSecondaryChange && (
-        <input
-          type="text"
-          value={localSecondary}
-          onChange={(e) => setLocalSecondary(e.target.value)}
-          onBlur={() => onSecondaryChange(localSecondary)}
-          className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder={secondaryPlaceholder}
-        />
+      <span className="text-gray-400 text-sm">g</span>
+
+      {isFlour && (
+        <>
+          <input
+            type="text"
+            value={localDetails}
+            onChange={(e) => setLocalDetails(e.target.value)}
+            onBlur={() => onUpdate({ details: localDetails || null })}
+            className="w-28 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Type"
+          />
+          <input
+            type="number"
+            step="0.1"
+            value={localProtein}
+            onChange={(e) => setLocalProtein(e.target.value)}
+            onBlur={() =>
+              onUpdate({
+                proteinContent: localProtein ? parseFloat(localProtein) : null,
+              })
+            }
+            className="w-16 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Protein"
+          />
+          <span className="text-gray-400 text-sm">%</span>
+        </>
       )}
+
+      <button
+        onClick={onRemove}
+        className="text-gray-400 hover:text-gray-600 ml-auto"
+      >
+        ×
+      </button>
     </div>
   );
 }

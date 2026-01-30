@@ -6,6 +6,11 @@ export async function GET() {
   try {
     const loaves = await prisma.sourdoughLoaf.findMany({
       orderBy: { date: "desc" },
+      include: {
+        ingredients: {
+          orderBy: { sortOrder: "asc" },
+        },
+      },
     });
 
     return NextResponse.json({ loaves });
@@ -17,6 +22,14 @@ export async function GET() {
     );
   }
 }
+
+type IngredientInput = {
+  name: string;
+  grams: number;
+  details?: string | null;
+  proteinContent?: number | null;
+  sortOrder?: number;
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,12 +49,32 @@ export async function POST(request: NextRequest) {
         starterFedDate: body.starterFedDate || null,
         initialMixTime: body.initialMixTime || null,
         temperature: body.temperature || null,
+        // Legacy fields - still supported for backwards compatibility
         flourGrams: body.flourGrams || null,
         flourType: body.flourType || null,
         waterGrams: body.waterGrams || null,
         starterGrams: body.starterGrams || null,
         stretchFolds: body.stretchFolds || [],
         notes: body.notes || null,
+        // New ingredients relationship
+        ingredients: body.ingredients
+          ? {
+              create: (body.ingredients as IngredientInput[]).map(
+                (ing, index) => ({
+                  name: ing.name,
+                  grams: ing.grams,
+                  details: ing.details || null,
+                  proteinContent: ing.proteinContent || null,
+                  sortOrder: ing.sortOrder ?? index,
+                })
+              ),
+            }
+          : undefined,
+      },
+      include: {
+        ingredients: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
     });
 
