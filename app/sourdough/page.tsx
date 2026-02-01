@@ -184,17 +184,14 @@ export default function SourdoughPage() {
         </Link>
       </header>
 
-      {/* Intro Section */}
-      <div className="max-w-2xl mx-auto w-full px-4 pt-6">
-        <div className="prose prose-slate text-lg text-slate-600 leading-relaxed">
-          {/* <p>
-            I love sourdough, and I love making it. But it's the worst feeling
-            in the world when you labor for two days to make the perfect loaf
-            only for it to come out as flat as a hockey puck. So I made this
-            website to track every variable I can think of that could contribute
-            to the potency of my oven rises.
-          </p> */}
-        </div>
+      {/* My Process Link */}
+      <div className="max-w-2xl mx-auto w-full px-4 pt-4 text-center">
+        <Link
+          href="/sourdough/process"
+          className={` ${tangerine.className} text-slate-900 hover:text-slate-700 transition-colors text-3xl`}
+        >
+          My baking process →
+        </Link>
       </div>
 
       {/* Main Content */}
@@ -419,8 +416,7 @@ export default function SourdoughPage() {
                               {displayName}
                             </span>
                             <span className="text-slate-900">
-                              {ing.grams}g
-                              {ing.details && ` ${ing.details}`}
+                              {ing.grams}g{ing.details && ` ${ing.details}`}
                               {ing.proteinContent && (
                                 <span className="text-slate-400 ml-1">
                                   ({ing.proteinContent}% protein)
