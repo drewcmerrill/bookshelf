@@ -62,6 +62,7 @@ export function DraggableBookList({ books: initialBooks }: { books: Book[] }) {
       const res = await fetch("/api/books/reorder", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           books: books.map((b) => ({
             id: b.id,
@@ -87,7 +88,7 @@ export function DraggableBookList({ books: initialBooks }: { books: Book[] }) {
   const handleDelete = async (id: number) => {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/books/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/books/${id}`, { method: "DELETE", credentials: "include" });
       if (res.ok) {
         setBooks(books.filter((b) => b.id !== id));
         router.refresh();
