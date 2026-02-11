@@ -105,3 +105,19 @@ model SourdoughIngredient {
 
   @@index([loafId])
 }
+
+model CribbageGame {
+  id               Int      @id @default(autoincrement())
+  date             DateTime @default(now())
+  drewScore        Int
+  aliScore         Int
+  coffeeShop       String   @db.VarChar(255)
+  coffeeBuyer      String   @db.VarChar(50)  // "drew" or "ali"
+  drewCoffeeRating Int?     // 1-10
+  aliCoffeeRating  Int?     // 1-10
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([date])
+}

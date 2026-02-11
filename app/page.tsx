@@ -27,7 +27,7 @@ export default function Home() {
               { href: "/bookshelf", label: "Bookshelf", numeral: "I." },
               { href: "/sourdough", label: "Sourdough Log", numeral: "II." },
               { href: "/jeopardy", label: "Jeopardy", numeral: "III." },
-              // { href: "/krypto", label: "Krypto", numeral: "IV." },
+              { href: "/cribbage", label: "Cribbage", numeral: "IV." },
             ].map((item) => (
               <li key={item.href}>
                 <Link
