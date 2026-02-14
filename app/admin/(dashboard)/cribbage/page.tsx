@@ -457,6 +457,7 @@ export default function AdminCribbagePage() {
                         weekday: "short",
                         month: "short",
                         day: "numeric",
+                        timeZone: "UTC",
                       })}
                     </div>
                     <div className="text-gray-500 text-sm">

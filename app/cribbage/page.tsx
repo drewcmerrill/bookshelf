@@ -215,6 +215,7 @@ export default function CribbagePage() {
                           weekday: "short",
                           month: "short",
                           day: "numeric",
+                          timeZone: "UTC",
                         })}
                       </div>
                       <div className="text-slate-500 text-sm">
