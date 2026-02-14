@@ -9,8 +9,8 @@ export async function GET() {
     });
 
     // Calculate stats
-    const drewWins = games.filter((g) => g.drewScore > g.aliScore).length;
-    const aliWins = games.filter((g) => g.aliScore > g.drewScore).length;
+    const drewWins = games.filter((g) => (g.drewScore ?? 0) > (g.aliScore ?? 0)).length;
+    const aliWins = games.filter((g) => (g.aliScore ?? 0) > (g.drewScore ?? 0)).length;
     const totalGames = games.length;
 
     // Current streak
@@ -18,10 +18,10 @@ export async function GET() {
     if (games.length > 0) {
       const firstGame = games[0];
       const streakPlayer =
-        firstGame.drewScore > firstGame.aliScore ? "drew" : "ali";
+        (firstGame.drewScore ?? 0) > (firstGame.aliScore ?? 0) ? "drew" : "ali";
       let count = 0;
       for (const game of games) {
-        const winner = game.drewScore > game.aliScore ? "drew" : "ali";
+        const winner = (game.drewScore ?? 0) > (game.aliScore ?? 0) ? "drew" : "ali";
         if (winner === streakPlayer) {
           count++;
         } else {
@@ -34,7 +34,9 @@ export async function GET() {
     // Favorite coffee shop (most visited)
     const shopCounts: Record<string, number> = {};
     for (const game of games) {
-      shopCounts[game.coffeeShop] = (shopCounts[game.coffeeShop] || 0) + 1;
+      if (game.coffeeShop) {
+        shopCounts[game.coffeeShop] = (shopCounts[game.coffeeShop] || 0) + 1;
+      }
     }
     const favoriteShop = Object.entries(shopCounts).sort(
       (a, b) => b[1] - a[1]
@@ -86,27 +88,27 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.drewScore || !body.aliScore || !body.coffeeShop || !body.coffeeBuyer) {
-      return NextResponse.json(
-        { error: "Drew score, Ali score, coffee shop, and coffee buyer are required" },
-        { status: 400 }
-      );
-    }
-
     const game = await prisma.cribbageGame.create({
       data: {
         date: body.date ? new Date(body.date) : new Date(),
-        drewScore: parseInt(body.drewScore),
-        aliScore: parseInt(body.aliScore),
-        coffeeShop: body.coffeeShop,
-        coffeeBuyer: body.coffeeBuyer,
+        drewScore: body.drewScore ? parseInt(body.drewScore) : null,
+        aliScore: body.aliScore ? parseInt(body.aliScore) : null,
+        coffeeShop: body.coffeeShop || null,
+        coffeeBuyer: body.coffeeBuyer || null,
         drewCoffeeRating: body.drewCoffeeRating
-          ? parseInt(body.drewCoffeeRating)
+          ? parseFloat(body.drewCoffeeRating)
           : null,
         aliCoffeeRating: body.aliCoffeeRating
-          ? parseInt(body.aliCoffeeRating)
+          ? parseFloat(body.aliCoffeeRating)
+          : null,
+        drewAmbianceRating: body.drewAmbianceRating
+          ? parseFloat(body.drewAmbianceRating)
+          : null,
+        aliAmbianceRating: body.aliAmbianceRating
+          ? parseFloat(body.aliAmbianceRating)
           : null,
         notes: body.notes || null,
+        firstCrib: body.firstCrib || null,
       },
     });
 

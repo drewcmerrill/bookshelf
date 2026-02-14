@@ -83,6 +83,39 @@ const navItems = [
     ),
   },
   {
+    href: "/admin/cribbage",
+    label: "Cribbage",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <rect
+          x="3"
+          y="4"
+          width="10"
+          height="16"
+          rx="1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+        />
+        <rect
+          x="11"
+          y="4"
+          width="10"
+          height="16"
+          rx="1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+        />
+      </svg>
+    ),
+  },
+  {
     href: "/admin/settings",
     label: "Settings",
     icon: (

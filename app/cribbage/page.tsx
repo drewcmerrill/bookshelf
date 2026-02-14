@@ -12,12 +12,15 @@ const tangerine = Tangerine({
 type CribbageGame = {
   id: number;
   date: string;
-  drewScore: number;
-  aliScore: number;
-  coffeeShop: string;
-  coffeeBuyer: string;
+  drewScore: number | null;
+  aliScore: number | null;
+  coffeeShop: string | null;
+  coffeeBuyer: string | null;
   drewCoffeeRating: number | null;
   aliCoffeeRating: number | null;
+  drewAmbianceRating: number | null;
+  aliAmbianceRating: number | null;
+  firstCrib: string | null;
   notes: string | null;
 };
 
@@ -200,7 +203,7 @@ export default function CribbagePage() {
         ) : (
           <div className="space-y-4">
             {games.map((game) => {
-              const drewWon = game.drewScore > game.aliScore;
+              const drewWon = (game.drewScore ?? 0) > (game.aliScore ?? 0);
               const winner = drewWon ? "Drew" : "Ali";
 
               return (
@@ -256,10 +259,24 @@ export default function CribbagePage() {
                         {game.coffeeBuyer === "drew" ? "Drew" : "Ali"}
                       </span>
                     </div>
+                    {game.firstCrib && (
+                      <div>
+                        First crib:{" "}
+                        <span className="text-slate-700">
+                          {game.firstCrib === "drew" ? "Drew" : "Ali"}
+                        </span>
+                      </div>
+                    )}
                     {(game.drewCoffeeRating || game.aliCoffeeRating) && (
                       <div>
-                        Ratings: Drew {game.drewCoffeeRating ?? "-"}/10, Ali{" "}
+                        Coffee: Drew {game.drewCoffeeRating ?? "-"}/10, Ali{" "}
                         {game.aliCoffeeRating ?? "-"}/10
+                      </div>
+                    )}
+                    {(game.drewAmbianceRating || game.aliAmbianceRating) && (
+                      <div>
+                        Ambiance: Drew {game.drewAmbianceRating ?? "-"}/10, Ali{" "}
+                        {game.aliAmbianceRating ?? "-"}/10
                       </div>
                     )}
                     {game.notes && (

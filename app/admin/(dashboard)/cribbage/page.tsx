@@ -6,12 +6,15 @@ import Link from "next/link";
 type CribbageGame = {
   id: number;
   date: string;
-  drewScore: number;
-  aliScore: number;
-  coffeeShop: string;
-  coffeeBuyer: string;
+  drewScore: number | null;
+  aliScore: number | null;
+  coffeeShop: string | null;
+  coffeeBuyer: string | null;
   drewCoffeeRating: number | null;
   aliCoffeeRating: number | null;
+  drewAmbianceRating: number | null;
+  aliAmbianceRating: number | null;
+  firstCrib: string | null;
   notes: string | null;
 };
 
@@ -42,8 +45,11 @@ export default function AdminCribbagePage() {
     aliScore: "",
     coffeeShop: "",
     coffeeBuyer: "drew",
+    firstCrib: "drew",
     drewCoffeeRating: "",
     aliCoffeeRating: "",
+    drewAmbianceRating: "",
+    aliAmbianceRating: "",
     notes: "",
   });
 
@@ -71,8 +77,11 @@ export default function AdminCribbagePage() {
       aliScore: "",
       coffeeShop: "",
       coffeeBuyer: "drew",
+      firstCrib: "drew",
       drewCoffeeRating: "",
       aliCoffeeRating: "",
+      drewAmbianceRating: "",
+      aliAmbianceRating: "",
       notes: "",
     });
     setEditingGame(null);
@@ -95,6 +104,9 @@ export default function AdminCribbagePage() {
           ...formData,
           drewCoffeeRating: formData.drewCoffeeRating || null,
           aliCoffeeRating: formData.aliCoffeeRating || null,
+          drewAmbianceRating: formData.drewAmbianceRating || null,
+          aliAmbianceRating: formData.aliAmbianceRating || null,
+          firstCrib: formData.firstCrib || null,
           notes: formData.notes || null,
         }),
       });
@@ -114,16 +126,19 @@ export default function AdminCribbagePage() {
   const handleEdit = (game: CribbageGame) => {
     setFormData({
       date: new Date(game.date).toISOString().split("T")[0],
-      drewScore: game.drewScore.toString(),
-      aliScore: game.aliScore.toString(),
-      coffeeShop: game.coffeeShop,
-      coffeeBuyer: game.coffeeBuyer,
+      drewScore: game.drewScore?.toString() || "",
+      aliScore: game.aliScore?.toString() || "",
+      coffeeShop: game.coffeeShop || "",
+      coffeeBuyer: game.coffeeBuyer || "drew",
+      firstCrib: game.firstCrib || "drew",
       drewCoffeeRating: game.drewCoffeeRating?.toString() || "",
       aliCoffeeRating: game.aliCoffeeRating?.toString() || "",
+      drewAmbianceRating: game.drewAmbianceRating?.toString() || "",
+      aliAmbianceRating: game.aliAmbianceRating?.toString() || "",
       notes: game.notes || "",
     });
     setEditingGame(game);
-    setShowForm(true);
+    setShowForm(false);
   };
 
   const handleDelete = async (id: number) => {
@@ -138,6 +153,258 @@ export default function AdminCribbagePage() {
       console.error("Failed to delete game:", error);
     }
   };
+
+  const renderFormFields = () => (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">Date</label>
+          <input
+            type="date"
+            value={formData.date}
+            onChange={(e) =>
+              setFormData({ ...formData, date: e.target.value })
+            }
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Coffee Shop
+          </label>
+          <input
+            type="text"
+            value={formData.coffeeShop}
+            onChange={(e) =>
+              setFormData({ ...formData, coffeeShop: e.target.value })
+            }
+            placeholder="e.g., Starbucks"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Drew&apos;s Score
+          </label>
+          <input
+            type="number"
+            value={formData.drewScore}
+            onChange={(e) =>
+              setFormData({ ...formData, drewScore: e.target.value })
+            }
+            min="0"
+            max="121"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Ali&apos;s Score
+          </label>
+          <input
+            type="number"
+            value={formData.aliScore}
+            onChange={(e) =>
+              setFormData({ ...formData, aliScore: e.target.value })
+            }
+            min="0"
+            max="121"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-gray-600 text-sm mb-1">
+          Who Bought Coffee?
+        </label>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="coffeeBuyer"
+              value="drew"
+              checked={formData.coffeeBuyer === "drew"}
+              onChange={(e) =>
+                setFormData({ ...formData, coffeeBuyer: e.target.value })
+              }
+              className="text-gray-900 focus:ring-gray-900"
+            />
+            <span className="text-sm text-gray-700">Drew</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="coffeeBuyer"
+              value="ali"
+              checked={formData.coffeeBuyer === "ali"}
+              onChange={(e) =>
+                setFormData({ ...formData, coffeeBuyer: e.target.value })
+              }
+              className="text-gray-900 focus:ring-gray-900"
+            />
+            <span className="text-sm text-gray-700">Ali</span>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-gray-600 text-sm mb-1">
+          Who Had First Crib?
+        </label>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="firstCrib"
+              value="drew"
+              checked={formData.firstCrib === "drew"}
+              onChange={(e) =>
+                setFormData({ ...formData, firstCrib: e.target.value })
+              }
+              className="text-gray-900 focus:ring-gray-900"
+            />
+            <span className="text-sm text-gray-700">Drew</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="firstCrib"
+              value="ali"
+              checked={formData.firstCrib === "ali"}
+              onChange={(e) =>
+                setFormData({ ...formData, firstCrib: e.target.value })
+              }
+              className="text-gray-900 focus:ring-gray-900"
+            />
+            <span className="text-sm text-gray-700">Ali</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Drew&apos;s Coffee Rating (1-10)
+          </label>
+          <input
+            type="number"
+            value={formData.drewCoffeeRating}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                drewCoffeeRating: e.target.value,
+              })
+            }
+            min="1"
+            max="10"
+            step="0.1"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Ali&apos;s Coffee Rating (1-10)
+          </label>
+          <input
+            type="number"
+            value={formData.aliCoffeeRating}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                aliCoffeeRating: e.target.value,
+              })
+            }
+            min="1"
+            max="10"
+            step="0.1"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Drew&apos;s Ambiance Rating (1-10)
+          </label>
+          <input
+            type="number"
+            value={formData.drewAmbianceRating}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                drewAmbianceRating: e.target.value,
+              })
+            }
+            min="1"
+            max="10"
+            step="0.1"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-600 text-sm mb-1">
+            Ali&apos;s Ambiance Rating (1-10)
+          </label>
+          <input
+            type="number"
+            value={formData.aliAmbianceRating}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                aliAmbianceRating: e.target.value,
+              })
+            }
+            min="1"
+            max="10"
+            step="0.1"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-gray-600 text-sm mb-1">Notes</label>
+        <textarea
+          value={formData.notes}
+          onChange={(e) =>
+            setFormData({ ...formData, notes: e.target.value })
+          }
+          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          rows={2}
+          placeholder="Any notable moments?"
+        />
+      </div>
+
+      <div className="flex gap-2 pt-2">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex-1 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white py-2.5 rounded-lg font-medium transition-colors"
+        >
+          {submitting
+            ? "Saving..."
+            : editingGame
+              ? "Update Game"
+              : "Add Game"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            resetForm();
+            setShowForm(false);
+          }}
+          className="px-6 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </>
+  );
 
   return (
     <div className="space-y-6">
@@ -241,192 +508,17 @@ export default function AdminCribbagePage() {
             d="M12 4v16m8-8H4"
           />
         </svg>
-        {showForm ? "Cancel" : "Add Game"}
+        {showForm && !editingGame ? "Cancel" : "Add Game"}
       </button>
 
-      {/* Add/Edit Form */}
-      {showForm && (
+      {/* Add New Game Form (only for new games, not edits) */}
+      {showForm && !editingGame && (
         <form
           onSubmit={handleSubmit}
           className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-4"
         >
-          <h2 className="font-semibold text-gray-900">
-            {editingGame ? "Edit Game" : "New Game"}
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">Date</label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: e.target.value })
-                }
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">
-                Coffee Shop
-              </label>
-              <input
-                type="text"
-                value={formData.coffeeShop}
-                onChange={(e) =>
-                  setFormData({ ...formData, coffeeShop: e.target.value })
-                }
-                placeholder="e.g., Starbucks"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">
-                Drew&apos;s Score
-              </label>
-              <input
-                type="number"
-                value={formData.drewScore}
-                onChange={(e) =>
-                  setFormData({ ...formData, drewScore: e.target.value })
-                }
-                min="0"
-                max="121"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">
-                Ali&apos;s Score
-              </label>
-              <input
-                type="number"
-                value={formData.aliScore}
-                onChange={(e) =>
-                  setFormData({ ...formData, aliScore: e.target.value })
-                }
-                min="0"
-                max="121"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-gray-600 text-sm mb-1">
-              Who Bought Coffee?
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="coffeeBuyer"
-                  value="drew"
-                  checked={formData.coffeeBuyer === "drew"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coffeeBuyer: e.target.value })
-                  }
-                  className="text-gray-900 focus:ring-gray-900"
-                />
-                <span className="text-sm text-gray-700">Drew</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="coffeeBuyer"
-                  value="ali"
-                  checked={formData.coffeeBuyer === "ali"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coffeeBuyer: e.target.value })
-                  }
-                  className="text-gray-900 focus:ring-gray-900"
-                />
-                <span className="text-sm text-gray-700">Ali</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">
-                Drew&apos;s Coffee Rating (1-10)
-              </label>
-              <input
-                type="number"
-                value={formData.drewCoffeeRating}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    drewCoffeeRating: e.target.value,
-                  })
-                }
-                min="1"
-                max="10"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-600 text-sm mb-1">
-                Ali&apos;s Coffee Rating (1-10)
-              </label>
-              <input
-                type="number"
-                value={formData.aliCoffeeRating}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    aliCoffeeRating: e.target.value,
-                  })
-                }
-                min="1"
-                max="10"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-gray-600 text-sm mb-1">Notes</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              rows={2}
-              placeholder="Any notable moments?"
-            />
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-1 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white py-2.5 rounded-lg font-medium transition-colors"
-            >
-              {submitting
-                ? "Saving..."
-                : editingGame
-                  ? "Update Game"
-                  : "Add Game"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                resetForm();
-                setShowForm(false);
-              }}
-              className="px-6 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
-            >
-              Cancel
-            </button>
-          </div>
+          <h2 className="font-semibold text-gray-900">New Game</h2>
+          {renderFormFields()}
         </form>
       )}
 
@@ -442,7 +534,22 @@ export default function AdminCribbagePage() {
       ) : (
         <div className="space-y-4">
           {games.map((game) => {
-            const drewWon = game.drewScore > game.aliScore;
+            const isEditing = editingGame?.id === game.id;
+
+            if (isEditing) {
+              return (
+                <form
+                  key={game.id}
+                  onSubmit={handleSubmit}
+                  className="bg-white border-2 border-blue-300 rounded-xl p-5 shadow-sm space-y-4"
+                >
+                  <h2 className="font-semibold text-gray-900">Edit Game</h2>
+                  {renderFormFields()}
+                </form>
+              );
+            }
+
+            const drewWon = (game.drewScore ?? 0) > (game.aliScore ?? 0);
             const winner = drewWon ? "Drew" : "Ali";
 
             return (
@@ -536,10 +643,24 @@ export default function AdminCribbagePage() {
                       {game.coffeeBuyer === "drew" ? "Drew" : "Ali"}
                     </span>
                   </div>
+                  {game.firstCrib && (
+                    <div>
+                      First crib:{" "}
+                      <span className="text-gray-700">
+                        {game.firstCrib === "drew" ? "Drew" : "Ali"}
+                      </span>
+                    </div>
+                  )}
                   {(game.drewCoffeeRating || game.aliCoffeeRating) && (
                     <div>
-                      Ratings: Drew {game.drewCoffeeRating ?? "-"}/10, Ali{" "}
+                      Coffee: Drew {game.drewCoffeeRating ?? "-"}/10, Ali{" "}
                       {game.aliCoffeeRating ?? "-"}/10
+                    </div>
+                  )}
+                  {(game.drewAmbianceRating || game.aliAmbianceRating) && (
+                    <div>
+                      Ambiance: Drew {game.drewAmbianceRating ?? "-"}/10, Ali{" "}
+                      {game.aliAmbianceRating ?? "-"}/10
                     </div>
                   )}
                   {game.notes && (

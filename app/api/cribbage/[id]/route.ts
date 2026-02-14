@@ -45,14 +45,25 @@ export async function PUT(
         drewCoffeeRating: body.drewCoffeeRating !== undefined
           ? body.drewCoffeeRating === null
             ? null
-            : parseInt(body.drewCoffeeRating)
+            : parseFloat(body.drewCoffeeRating)
           : undefined,
         aliCoffeeRating: body.aliCoffeeRating !== undefined
           ? body.aliCoffeeRating === null
             ? null
-            : parseInt(body.aliCoffeeRating)
+            : parseFloat(body.aliCoffeeRating)
+          : undefined,
+        drewAmbianceRating: body.drewAmbianceRating !== undefined
+          ? body.drewAmbianceRating === null
+            ? null
+            : parseFloat(body.drewAmbianceRating)
+          : undefined,
+        aliAmbianceRating: body.aliAmbianceRating !== undefined
+          ? body.aliAmbianceRating === null
+            ? null
+            : parseFloat(body.aliAmbianceRating)
           : undefined,
         notes: body.notes !== undefined ? body.notes : undefined,
+        firstCrib: body.firstCrib !== undefined ? body.firstCrib : undefined,
       },
     });
 
